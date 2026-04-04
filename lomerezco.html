@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lomerezco.cl</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--max-w:480px}
+body{font-family:Arial,sans-serif;background:radial-gradient(ellipse at 50% 0%,#ffdd00 0%,#ff6600 40%,#ff0066 100%);min-height:100vh;background-attachment:fixed}
+
+/* ===== TOPBAR / IDIOMAS ===== */
+.topbar{width:100%;max-width:var(--max-w);margin:0 auto;display:flex;justify-content:flex-end;padding:10px 1.2rem 0;position:relative;z-index:50}
+.lang-select-wrap{position:relative}
+.lang-trigger{padding:7px 13px;border-radius:20px;border:2px solid rgba(255,255,255,0.65);background:rgba(0,0,0,0.38);color:#fff;font-size:13px;cursor:pointer;font-weight:bold;display:flex;align-items:center;gap:6px;user-select:none;transition:background 0.15s}
+.lang-trigger:hover{background:rgba(0,0,0,0.55)}
+.lang-arrow{font-size:10px;transition:transform 0.2s;display:inline-block}
+.lang-dropdown{display:none;position:absolute;top:calc(100% + 6px);right:0;background:rgba(18,18,18,0.97);border:1px solid rgba(255,255,255,0.18);border-radius:12px;overflow:hidden;min-width:175px;z-index:100;box-shadow:0 8px 28px rgba(0,0,0,0.6)}
+.lang-dropdown.open{display:block}
+.lang-option{padding:9px 14px;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.12s}
+.lang-option:hover{background:rgba(255,204,0,0.18)}
+.lang-option.active{background:rgba(255,204,0,0.13);color:#ffcc00;font-weight:bold}
+
+/* ===== APP WRAPPER ===== */
+.app{width:100%;max-width:var(--max-w);margin:0 auto;display:flex;flex-direction:column;align-items:center;padding:0 1.2rem 3rem;position:relative}
+
+/* ===== PANTALLAS ===== */
+.screen{display:none;width:100%;flex-direction:column;align-items:center}
+.screen.active{display:flex}
+
+/* ===== TIPOGRAFÍA GENERAL ===== */
+h1{font-size:clamp(1.6em,5vw,2.2em);color:#fff;text-shadow:2px 3px 0 rgba(0,0,0,0.5);margin:0.8rem 0 0.2rem;letter-spacing:-1px;text-align:center}
+.tagline{font-size:clamp(0.8em,3vw,0.95em);color:rgba(255,255,255,0.9);text-shadow:1px 1px 0 rgba(0,0,0,0.4);margin-bottom:1rem;font-style:italic;text-align:center}
+
+/* ===== FORMULARIO REGISTRO ===== */
+.reg-form{background:rgba(0,0,0,0.6);border-radius:16px;padding:1.2rem 1.4rem;width:100%;color:#fff;margin-bottom:1rem;border:1px solid rgba(255,255,255,0.1)}
+.reg-form h2{font-size:1em;margin-bottom:0.8rem;color:#ffcc00;text-align:center;letter-spacing:0.03em}
+.field-group{margin-bottom:9px}
+.field-group label{font-size:11px;color:rgba(255,255,255,0.55);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.06em}
+.reg-form input{width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;font-size:14px;background:rgba(255,255,255,0.12);color:#fff;transition:border 0.15s,background 0.15s}
+.reg-form input::placeholder{color:rgba(255,255,255,0.35)}
+.reg-form input:focus{outline:none;border-color:#ffcc00;background:rgba(255,255,255,0.2)}
+
+/* ===== BOTÓN PUSH ===== */
+.push-btn{
+  width:clamp(120px,30vw,150px);
+  height:clamp(120px,30vw,150px);
+  border-radius:50%;
+  border:4px solid #1a7a1a;
+  cursor:pointer;
+  background:radial-gradient(circle at 35% 30%,#7dff5e,#2ecc2e 50%,#1a7a1a 85%);
+  box-shadow:0 8px 0 #0d4a0d,0 14px 28px rgba(0,0,0,0.45),
+             inset 0 5px 14px rgba(255,255,255,0.45),
+             inset 0 -5px 10px rgba(0,0,0,0.35);
+  color:#003300;
+  font-size:clamp(1.1em,4vw,1.5em);
+  font-weight:900;
+  letter-spacing:1px;
+  text-shadow:0 1px 2px rgba(255,255,255,0.4);
+  transition:transform 0.08s,box-shadow 0.08s;
+  animation:btnpulse 2s infinite;
+  margin-bottom:0.4rem
+}
+.push-btn:active{
+  transform:translateY(7px)!important;
+  animation:none;
+  box-shadow:0 2px 0 #0d4a0d,0 4px 10px rgba(0,0,0,0.4),inset 0 4px 12px rgba(0,0,0,0.3)
+}
+@keyframes btnpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+
+/* ===== PANTALLA CONFIRMACIÓN EMAIL ===== */
+.confirm-box{background:rgba(0,0,0,0.62);border-radius:16px;padding:1.5rem 1.3rem;width:100%;text-align:center;color:#fff;border:1px solid rgba(255,255,255,0.1)}
+.confirm-icon{font-size:2.8em;margin-bottom:0.5rem}
+.confirm-box h2{color:#ffcc00;margin-bottom:0.5rem;font-size:1.2em}
+.confirm-box p{font-size:13px;color:rgba(255,255,255,0.8);line-height:1.55}
+.confirm-input{width:100%;padding:11px 12px;border:2px solid rgba(255,255,255,0.2);border-radius:8px;font-size:22px;text-align:center;letter-spacing:0.3em;font-weight:bold;margin:1rem 0;background:rgba(255,255,255,0.12);color:#fff}
+.confirm-input:focus{outline:none;border-color:#ffcc00}
+.btn-verify{width:100%;padding:12px;border-radius:8px;border:none;background:#22bb22;color:#fff;font-size:14px;font-weight:bold;cursor:pointer;transition:background 0.15s}
+.btn-verify:hover{background:#1ea01e}
+
+/* ===== RULETA ===== */
+.wheel-title{font-size:clamp(1.2em,4vw,1.6em);color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,0.4);margin:0.7rem 0 0.1rem;text-align:center}
+.wheel-sub{font-size:clamp(0.75em,2.5vw,0.85em);color:rgba(255,255,255,0.82);text-shadow:1px 1px 0 rgba(0,0,0,0.3);margin-bottom:0.6rem;text-align:center}
+.wheel-wrap{position:relative;margin:0 auto 0.4rem}
+.pointer{position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:26px solid #fff;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));z-index:10}
+canvas#wc{border-radius:50%;box-shadow:0 6px 0 rgba(0,0,0,0.35),0 12px 28px rgba(0,0,0,0.4);display:block}
+.wcenter{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#fff,#ccc);box-shadow:0 2px 6px rgba(0,0,0,0.5);z-index:5}
+
+/* ===== LEYENDA ===== */
+.legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:0.3rem 0;width:100%}
+.li{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,0.38);border-radius:20px;padding:4px 9px;font-size:11px;color:#fff}
+.ld{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* ===== BARRA DE GIROS ===== */
+.spins-bar{background:rgba(0,0,0,0.48);border-radius:12px;padding:9px 14px;margin:0.4rem 0;width:100%;text-align:center;border:1px solid rgba(255,255,255,0.08)}
+.spins-count{font-size:1.05em;font-weight:900;color:#ffcc00}
+.spins-label{font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px}
+.spins-actions{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+.spins-btn{padding:6px 13px;border-radius:20px;border:none;font-size:12px;font-weight:bold;cursor:pointer;transition:opacity 0.15s}
+.spins-btn:hover{opacity:0.85}
+.btn-video{background:#3498db;color:#fff}
+.btn-sub{background:#ffcc00;color:#000}
+
+/* ===== BOTÓN GIRAR ===== */
+.spin-btn{margin:0.5rem 0;padding:12px 44px;background:#ffcc00;color:#000;border:none;border-radius:50px;font-size:clamp(0.9em,3vw,1.05em);font-weight:900;cursor:pointer;box-shadow:0 4px 0 #b38f00,0 8px 16px rgba(0,0,0,0.25);transition:transform 0.08s,box-shadow 0.08s}
+.spin-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #b38f00}
+.spin-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+
+/* ===== TARJETA RESULTADO ===== */
+.result-card{width:100%;border-radius:16px;padding:1.2rem 1rem;text-align:center;margin:0.4rem 0;display:none;animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);color:#fff}
+.result-card.show{display:block}
+@keyframes popIn{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
+.result-main{font-size:clamp(1.1em,4vw,1.45em);font-weight:900;line-height:1.2;margin-bottom:0.6rem}
+.result-support{font-size:clamp(0.8em,2.5vw,0.9em);line-height:1.55;opacity:0.92}
+
+/* ===== MODALES ===== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:200;justify-content:center;align-items:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:#1a1a1a;border-radius:16px;padding:1.5rem;width:100%;max-width:360px;color:#fff;border:1px solid rgba(255,255,255,0.12)}
+.modal h3{color:#ffcc00;font-size:1.1em;margin-bottom:0.7rem;text-align:center}
+.modal p{font-size:13px;color:rgba(255,255,255,0.78);margin-bottom:1rem;line-height:1.5;text-align:center}
+.modal-btn{width:100%;padding:10px;border-radius:8px;border:none;font-size:14px;font-weight:bold;cursor:pointer;margin-bottom:8px;transition:opacity 0.15s}
+.modal-btn:hover{opacity:0.88}
+.btn-confirm{background:#22bb22;color:#fff}
+.btn-cancel{background:rgba(255,255,255,0.1);color:#fff}
+.price-box{background:rgba(255,204,0,0.1);border-radius:10px;padding:12px;margin-bottom:1rem;border:1px solid rgba(255,204,0,0.28);text-align:center}
+.price-box .price{font-size:1.5em;font-weight:900;color:#ffcc00}
+.price-box .price-sub{font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px}
+.vid-box{background:#111;height:72px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;margin-bottom:1rem}
+
+/* ===== BOTÓN VOLVER ===== */
+.back-btn{margin-top:0.5rem;padding:7px 22px;background:rgba(255,255,255,0.18);color:#fff;border:2px solid rgba(255,255,255,0.4);border-radius:30px;font-size:0.82em;cursor:pointer;transition:background 0.15s}
+.back-btn:hover{background:rgba(255,255,255,0.28)}
+
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(10,10,10,0.92);color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;z-index:500;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:400px){
+  .reg-form{padding:1rem}
+  .spins-actions{flex-direction:column;align-items:center}
+  .modal{padding:1.2rem}
+}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- SELECTOR DE IDIOMA -->
+<div class="topbar">
+  <div class="lang-select-wrap" id="langWrap">
+    <div class="lang-trigger" id="langTrigger">
+      <span id="langFlag">🇨🇱</span>
+      <span id="langName">Español</span>
+      <span class="lang-arrow" id="langArrow">▼</span>
+    </div>
+    <div class="lang-dropdown" id="langDropdown"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- PANTALLA 1: REGISTRO -->
+  <div id="s1" class="screen active">
+    <h1 id="t-title">lomerezco.cl</h1>
+    <p class="tagline" id="t-tagline">¿Lo necesitas o lo deseas?</p>
+    <div class="reg-form">
+      <h2 id="t-formtitle">Cuéntanos sobre ti</h2>
+      <div class="field-group">
+        <label id="t-namelabel">Nombre o Nick</label>
+        <input type="text" id="inp-name" placeholder="¿Cómo te llamas?" autocomplete="nickname">
+      </div>
+      <div class="field-group">
+        <label id="t-doblabel">Fecha de nacimiento</label>
+        <input type="date" id="inp-dob">
+      </div>
+      <div class="field-group">
+        <label id="t-maillabel">Correo electrónico</label>
+        <input type="email" id="inp-mail" placeholder="tu@correo.com" autocomplete="email">
+      </div>
+    </div>
+    <button class="push-btn" id="pushBtn">PUSH</button>
+    <p style="color:rgba(255,255,255,0.72);font-size:0.78em;margin-top:0.3rem;text-align:center" id="t-pushsub">Pulsa para girar la ruleta</p>
+  </div>
+
+  <!-- PANTALLA 2: VERIFICACIÓN EMAIL -->
+  <div id="s-confirm" class="screen">
+    <h1 id="t-title2">lomerezco.cl</h1>
+    <div class="confirm-box" style="margin-top:1rem">
+      <div class="confirm-icon">✉️</div>
+      <h2 id="t-confirmtitle">¡Revisa tu correo!</h2>
+      <p id="t-confirmsub">Te enviamos un código de 6 dígitos a <strong id="confirm-email"></strong>. Ingrésalo para activar tu cuenta.</p>
+      <input class="confirm-input" type="text" id="inp-code" maxlength="6" placeholder="000000" inputmode="numeric" pattern="[0-9]*">
+      <button class="btn-verify" id="verifyBtn">Verificar y entrar</button>
+      <p style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:0.8rem">
+        <span id="t-resend">¿No llegó?</span>
+        <a href="#" onclick="resendCode();return false;" style="color:#ffcc00" id="t-resendlink">Reenviar código</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- PANTALLA 3: RULETA -->
+  <div id="s2" class="screen">
+    <p class="wheel-title" id="t-wheeltitle">La ruleta decide</p>
+    <p class="wheel-sub" id="t-wheelsub">Gira y escucha lo que necesitas hoy</p>
+    <div class="wheel-wrap" id="wheelWrap">
+      <div class="pointer"></div>
+      <canvas id="wc"></canvas>
+      <div class="wcenter"></div>
+    </div>
+    <div class="legend">
+      <div class="li"><div class="ld" style="background:#e74c3c"></div><span id="t-leg1">Compra sin culpa (10)</span></div>
+      <div class="li"><div class="ld" style="background:#27ae60"></div><span id="t-leg2">Autocontrol (40)</span></div>
+    </div>
+    <div class="spins-bar">
+      <div class="spins-count"><span id="spins-left">3</span> / 3 <span id="t-spinslabel">giros disponibles hoy</span></div>
+      <div class="spins-label" id="t-spinssub">Se recargan cada 24 horas</div>
+      <div class="spins-actions">
+        <button class="spins-btn btn-video" id="t-vidBtn" onclick="watchVideo()">▶ Ver video (+1 giro)</button>
+        <button class="spins-btn btn-sub" id="t-subBtn" onclick="openSub()">⭐ Suscripción ilimitada</button>
+      </div>
+    </div>
+    <button class="spin-btn" id="spinBtn" onclick="spinWheel()">GIRAR</button>
+    <div class="result-card" id="rc">
+      <div class="result-main" id="rmain"></div>
+      <div class="result-support" id="rsup"></div>
+    </div>
+    <button class="back-btn" onclick="goBack()" id="t-back">Volver al inicio</button>
+  </div>
+
+</div><!-- /app -->
+
+<!-- MODAL: VIDEO -->
+<div class="modal-overlay" id="videoModal">
+  <div class="modal">
+    <h3 id="t-vidtitle">Ver video publicitario</h3>
+    <p id="t-vidtext">Mira el video completo para ganar 1 giro extra.</p>
+    <div class="vid-box">▶ Cargando video... <span id="vidTimer" style="margin-left:6px;font-weight:bold;color:#ffcc00">30</span>s</div>
+    <button class="modal-btn btn-cancel" onclick="closeModal('videoModal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL: SUSCRIPCIÓN -->
+<div class="modal-overlay" id="subModal">
+  <div class="modal">
+    <h3>⭐ Suscripción Premium</h3>
+    <p id="t-subtext">Giros ilimitados todos los días, sin anuncios y con estadísticas de tus hábitos de compra.</p>
+    <div class="price-box">
+      <div class="price">$2.990 / mes</div>
+      <div class="price-sub">CLP · Cancela cuando quieras</div>
+    </div>
+    <button class="modal-btn btn-confirm" onclick="subscribeMock()">Suscribirme ahora</button>
+    <button class="modal-btn btn-cancel" onclick="closeModal('subModal')">Ahora no</button>
+  </div>
+</div>
+
+<script>
+/* =====================================================
+   IDIOMAS
+===================================================== */
+const langs = {
+  es: {
+    flag:"🇨🇱", name:"Español",
+    title:"lomerezco.cl", tagline:"¿Lo necesitas o lo deseas?",
+    formtitle:"Cuéntanos sobre ti", namelabel:"Nombre o Nick",
+    nameph:"¿Cómo te llamas?", doblabel:"Fecha de nacimiento",
+    maillabel:"Correo electrónico", mailph:"tu@correo.com",
+    pushsub:"Pulsa para girar la ruleta",
+    wheeltitle:"La ruleta decide", wheelsub:"Gira y escucha lo que necesitas hoy",
+    leg1:"Compra sin culpa (10)", leg2:"Autocontrol (40)",
+    back:"Volver al inicio", spinbtn:"GIRAR",
+    spinslabel:"giros disponibles hoy", spinssub:"Se recargan cada 24 horas",
+    vidBtn:"▶ Ver video (+1 giro)", subBtn:"⭐ Suscripción ilimitada",
+    confirmtitle:"¡Revisa tu correo!",
+    confirmsub:"Te enviamos un código de 6 dígitos a",
+    confirmend:"Ingrésalo para activar tu cuenta.",
+    verifyBtn:"Verificar y entrar",
+    resend:"¿No llegó?", resendLink:"Reenviar código",
+    permit_support:"Comprarte algo que deseas no te hace irresponsable, te hace humano. ¡Disfrútalo sin culpa, con conciencia!",
+    control_support:"Cada vez que eliges no comprar por impulso, estás construyendo tu libertad financiera. ¡Eso es poder real!"
+  },
+  es_lat: {
+    flag:"🌎", name:"Español Latino",
+    title:"lomerezco.cl", tagline:"¿Lo necesitás o solo lo querés?",
+    formtitle:"Contanos sobre vos", namelabel:"Nombre o Nick",
+    nameph:"¿Cómo te llamás?", doblabel:"Fecha de nacimiento",
+    maillabel:"Correo electrónico", mailph:"tu@correo.com",
+    pushsub:"Apretá para girar la ruleta",
+    wheeltitle:"La ruleta decide", wheelsub:"Girá y escuchá lo que necesitás hoy",
+    leg1:"Compra sin culpa (10)", leg2:"Autocontrol (40)",
+    back:"Volver al inicio", spinbtn:"GIRAR",
+    spinslabel:"giros disponibles hoy", spinssub:"Se recargan cada 24 horas",
+    vidBtn:"▶ Ver video (+1 giro)", subBtn:"⭐ Suscripción ilimitada",
+    confirmtitle:"¡Revisá tu correo!",
+    confirmsub:"Te mandamos un código de 6 dígitos a",
+    confirmend:"Ingresalo para activar tu cuenta.",
+    verifyBtn:"Verificar y entrar",
+    resend:"¿No llegó?", resendLink:"Reenviar código",
+    permit_support:"Comprarte algo que querés no te hace irresponsable, ¡te hace humano. Disfrutalo sin culpa!",
+    control_support:"Cada vez que elegís no comprar por impulso, estás construyendo tu libertad financiera. ¡Orgullo!"
+  },
+  en: {
+    flag:"🇺🇸", name:"English",
+    title:"ideserveit.app", tagline:"Do you need it or just want it?",
+    formtitle:"Tell us about you", namelabel:"Name or Nickname",
+    nameph:"What's your name?", doblabel:"Date of birth",
+    maillabel:"Email address", mailph:"you@email.com",
+    pushsub:"Press to spin the wheel",
+    wheeltitle:"The wheel decides", wheelsub:"Spin and hear what you need today",
+    leg1:"Buy without guilt (10)", leg2:"Self-control (40)",
+    back:"Back to start", spinbtn:"SPIN",
+    spinslabel:"spins left today", spinssub:"Resets every 24 hours",
+    vidBtn:"▶ Watch video (+1 spin)", subBtn:"⭐ Unlimited subscription",
+    confirmtitle:"Check your inbox!",
+    confirmsub:"We sent a 6-digit code to",
+    confirmend:"Enter it to activate your account.",
+    verifyBtn:"Verify & enter",
+    resend:"Didn't arrive?", resendLink:"Resend code",
+    permit_support:"Buying something you desire doesn't make you irresponsible — it makes you human. Enjoy it guilt-free, with awareness!",
+    control_support:"Every time you choose not to buy on impulse, you're building your financial freedom. That's real power!"
+  },
+  it: {
+    flag:"🇮🇹", name:"Italiano",
+    title:"meloMerito.it", tagline:"Ne hai bisogno o lo vuoi solo?",
+    formtitle:"Parlaci di te", namelabel:"Nome o soprannome",
+    nameph:"Come ti chiami?", doblabel:"Data di nascita",
+    maillabel:"Indirizzo email", mailph:"tu@email.it",
+    pushsub:"Premi per girare la ruota",
+    wheeltitle:"La ruota decide", wheelsub:"Gira e ascolta cosa ti serve oggi",
+    leg1:"Compra senza colpa (10)", leg2:"Autocontrollo (40)",
+    back:"Torna all'inizio", spinbtn:"GIRA",
+    spinslabel:"giri disponibili oggi", spinssub:"Si ricaricano ogni 24 ore",
+    vidBtn:"▶ Guarda video (+1 giro)", subBtn:"⭐ Abbonamento illimitato",
+    confirmtitle:"Controlla la tua email!",
+    confirmsub:"Abbiamo inviato un codice a",
+    confirmend:"Inseriscilo per attivare il tuo account.",
+    verifyBtn:"Verifica ed entra",
+    resend:"Non è arrivato?", resendLink:"Rinvia codice",
+    permit_support:"Comprarti qualcosa che desideri non ti rende irresponsabile — ti rende umano. Goditi il momento senza sensi di colpa!",
+    control_support:"Ogni volta che scegli di non comprare d'impulso, stai costruendo la tua libertà finanziaria. Forza!"
+  },
+  pt: {
+    flag:"🇧🇷", name:"Português",
+    title:"mereço.app", tagline:"Você precisa ou só quer?",
+    formtitle:"Conte-nos sobre você", namelabel:"Nome ou apelido",
+    nameph:"Como você se chama?", doblabel:"Data de nascimento",
+    maillabel:"E-mail", mailph:"voce@email.com",
+    pushsub:"Clique para girar a roleta",
+    wheeltitle:"A roleta decide", wheelsub:"Gire e ouça o que você precisa hoje",
+    leg1:"Compra sem culpa (10)", leg2:"Autocontrole (40)",
+    back:"Voltar ao início", spinbtn:"GIRAR",
+    spinslabel:"giros disponíveis hoje", spinssub:"Recarregam a cada 24 horas",
+    vidBtn:"▶ Assistir vídeo (+1 giro)", subBtn:"⭐ Assinatura ilimitada",
+    confirmtitle:"Verifique seu e-mail!",
+    confirmsub:"Enviamos um código de 6 dígitos para",
+    confirmend:"Digite-o para ativar sua conta.",
+    verifyBtn:"Verificar e entrar",
+    resend:"Não chegou?", resendLink:"Reenviar código",
+    permit_support:"Comprar algo que você deseja não te torna irresponsável — te torna humano. Aproveite sem culpa e com consciência!",
+    control_support:"Cada vez que você escolhe não comprar por impulso, está construindo sua liberdade financeira. Isso é poder!"
+  },
+  zh: {
+    flag:"🇨🇳", name:"中文",
+    title:"我值得吗", tagline:"你需要它还是只是想要它？",
+    formtitle:"告诉我们关于你的事", namelabel:"姓名或昵称",
+    nameph:"你叫什么名字？", doblabel:"出生日期",
+    maillabel:"电子邮件", mailph:"你@邮件.com",
+    pushsub:"按下转动转盘",
+    wheeltitle:"转盘决定", wheelsub:"转动并听听今天你需要什么",
+    leg1:"放心购买 (10)", leg2:"自我控制 (40)",
+    back:"返回开始", spinbtn:"转动",
+    spinslabel:"今天剩余转数", spinssub:"每24小时重置",
+    vidBtn:"▶ 看视频 (+1次)", subBtn:"⭐ 无限订阅",
+    confirmtitle:"查看您的邮件！",
+    confirmsub:"我们发送了6位数字代码到",
+    confirmend:"请输入以激活您的账户。",
+    verifyBtn:"验证并进入",
+    resend:"没收到？", resendLink:"重新发送",
+    permit_support:"买你想要的东西并不会让你变得不负责任——这让你更有人情味。享受它，无需内疚！",
+    control_support:"每次你选择不冲动消费，都在建立你的财务自由。这才是真正的力量！"
+  },
+  fr: {
+    flag:"🇫🇷", name:"Français",
+    title:"jelemérite.fr", tagline:"En as-tu besoin ou le veux-tu seulement?",
+    formtitle:"Parle-nous de toi", namelabel:"Nom ou surnom",
+    nameph:"Comment tu t'appelles?", doblabel:"Date de naissance",
+    maillabel:"Adresse e-mail", mailph:"toi@email.fr",
+    pushsub:"Appuie pour tourner la roue",
+    wheeltitle:"La roue décide", wheelsub:"Tourne et écoute ce dont tu as besoin",
+    leg1:"Achète sans culpabilité (10)", leg2:"Maîtrise de soi (40)",
+    back:"Retour au début", spinbtn:"TOURNER",
+    spinslabel:"tours disponibles aujourd'hui", spinssub:"Se rechargent toutes les 24h",
+    vidBtn:"▶ Voir vidéo (+1 tour)", subBtn:"⭐ Abonnement illimité",
+    confirmtitle:"Vérifie ton e-mail!",
+    confirmsub:"Nous t'avons envoyé un code à",
+    confirmend:"Entre-le pour activer ton compte.",
+    verifyBtn:"Vérifier et entrer",
+    resend:"Pas reçu?", resendLink:"Renvoyer le code",
+    permit_support:"T'acheter quelque chose que tu désires ne te rend pas irresponsable — cela te rend humain. Profites-en sans culpabilité!",
+    control_support:"Chaque fois que tu choisis de ne pas acheter impulsivement, tu construis ta liberté financière. C'est ça le vrai pouvoir!"
+  }
+};
+
+/* =====================================================
+   FRASES DE LA RULETA
+===================================================== */
+const permitPhrases = [
+  "Para eso trabajo 💸",
+  "Me lo merezco 😎",
+  "La vida es una sola 😌",
+  "Es oferta, sería un pecado no comprarlo 😇",
+  "Es una inversión emocional 🧠",
+  "Una vez no hace daño… (otra vez) 😅",
+  "Después veo cómo lo pago 🤷",
+  "Dios proveerá 🙏",
+  "Total, ya estoy endeudado 😬",
+  "Que mi yo del futuro lo solucione ⏳"
+];
+
+const controlPhrases = [
+  "¿Lo necesitas o solo lo quieres?",
+  "Espera 24 horas antes de decidir",
+  "Tu yo del futuro te lo agradecerá",
+  "No todo lo que brilla vale tu dinero",
+  "El impulso dura minutos, la deuda meses",
+  "Comprar no siempre es ganar",
+  "Menos cosas, más tranquilidad",
+  "La paciencia también es riqueza",
+  "No compres emociones momentáneas",
+  "Pensar antes de gastar es ganar",
+  "Cada peso cuenta",
+  "Ahorra hoy, disfruta mañana",
+  "Tu dinero puede trabajar para ti",
+  "El ahorro es libertad",
+  "Pequeños gastos = grandes pérdidas",
+  "Lo barato a veces sale caro",
+  "No gastar también es ganar",
+  "Controlar gastos es poder",
+  "El dinero bien cuidado crece",
+  "Un buen hábito hoy, riqueza mañana",
+  "Respira… no es urgente",
+  "El impulso es pasajero",
+  "No necesitas comprar para sentirte mejor",
+  "El autocontrol también se entrena",
+  "No todo antojo merece dinero",
+  "Tu disciplina vale más",
+  "No es necesidad, es impulso",
+  "Decide con la cabeza, no con la emoción",
+  "No compres por aburrimiento",
+  "No todo lo que quieres lo necesitas",
+  "Ese dinero puede ser una inversión",
+  "Piensa en tu meta, no en el momento",
+  "El futuro se construye hoy",
+  "Cada decisión cuenta",
+  "Hoy decides tu libertad financiera",
+  "Tu esfuerzo merece mejores decisiones",
+  "El dinero guardado es tranquilidad",
+  "El control hoy es éxito mañana",
+  "Menos gasto, más oportunidades",
+  "Tu mejor compra es no comprar"
+];
+
+const controlColors = [
+  "#27ae60","#2980b9","#8e44ad","#16a085","#1d8348",
+  "#2471a3","#7d3c98","#0e6655","#1a5276","#6c3483",
+  "#117a65","#1f618d","#76448a","#0b5345","#154360",
+  "#27ae60","#2980b9","#8e44ad","#16a085","#1d8348",
+  "#2471a3","#7d3c98","#0e6655","#1a5276","#6c3483",
+  "#117a65","#1f618d","#76448a","#0b5345","#154360",
+  "#27ae60","#2980b9","#8e44ad","#16a085","#1d8348",
+  "#2471a3","#7d3c98","#0e6655","#1a5276","#6c3483"
+];
+
+/* Distribuye los segmentos: 1 rojo cada 5 posiciones */
+function buildSegs() {
+  const segs = [];
+  let pi = 0, ci = 0;
+  for (let i = 0; i < 50; i++) {
+    const isP = (i % 5 === 2) && pi < 10;
+    if (isP) {
+      const t = permitPhrases[pi];
+      const w = t.replace(/[💸😎😌😇🧠💔😅🤷🙏😬⏳]/g,'').trim().split(' ');
+      const h = Math.ceil(w.length / 2);
+      segs.push({ label: w.slice(0,h).join(' ') + '\n' + w.slice(h).join(' '), color:'#e74c3c', type:'permit', full:t });
+      pi++;
+    } else if (ci < 40) {
+      const t = controlPhrases[ci];
+      const w = t.split(' ');
+      const h = Math.ceil(w.length / 2);
+      segs.push({ label: w.slice(0,h).join(' ') + '\n' + w.slice(h).join(' '), color:controlColors[ci], type:'control', full:t });
+      ci++;
+    }
+  }
+  return segs;
+}
+const allSegs = buildSegs();
+
+/* =====================================================
+   ESTADO GLOBAL
+===================================================== */
+let currentLang = 'es';
+let currentAngle = 0;
+let spinning = false;
+let audioCtx = null;
+let spinsLeft = 3;
+let mockCode = '';
+let vidInterval = null;
+let WS = 280;
+
+/* =====================================================
+   AUDIO
+===================================================== */
+function getAC() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTick() {
+  try {
+    const c = getAC(), o = c.createOscillator(), g = c.createGain();
+    o.connect(g); g.connect(c.destination);
+    o.frequency.value = 900;
+    g.gain.setValueAtTime(0.09, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.035);
+    o.start(); o.stop(c.currentTime + 0.04);
+  } catch(e) {}
+}
+function playWin() {
+  try {
+    const c = getAC();
+    [523, 659, 784, 1046].forEach((f, i) => {
+      const o = c.createOscillator(), g = c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.frequency.value = f;
+      const t = c.currentTime + i * 0.12;
+      g.gain.setValueAtTime(0.2, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      o.start(t); o.stop(t + 0.28);
+    });
+  } catch(e) {}
+}
+function playCalm() {
+  try {
+    const c = getAC();
+    [392, 494, 587].forEach((f, i) => {
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = 'sine'; o.connect(g); g.connect(c.destination);
+      o.frequency.value = f;
+      const t = c.currentTime + i * 0.18;
+      g.gain.setValueAtTime(0.1, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      o.start(t); o.stop(t + 0.45);
+    });
+  } catch(e) {}
+}
+
+/* =====================================================
+   RULETA (CANVAS)
+===================================================== */
+function initCanvas() {
+  const vw = Math.min(window.innerWidth - 40, 440);
+  WS = Math.min(vw, 290);
+  const wrap = document.getElementById('wheelWrap');
+  const cv = document.getElementById('wc');
+  cv.width = WS; cv.height = WS;
+  wrap.style.width = WS + 'px';
+  wrap.style.height = WS + 'px';
+  drawWheel(currentAngle);
+}
+
+function drawWheel(angle) {
+  const cv = document.getElementById('wc');
+  const ct = cv.getContext('2d');
+  const s = WS / 2, r = s - 3;
+  ct.clearRect(0, 0, WS, WS);
+  const n = allSegs.length, arc = (2 * Math.PI) / n;
+  ct.save(); ct.translate(s, s); ct.rotate(angle);
+  allSegs.forEach((seg, i) => {
+    const sa = i * arc - Math.PI / 2, ea = sa + arc;
+    ct.beginPath(); ct.moveTo(0,0); ct.arc(0, 0, r, sa, ea); ct.closePath();
+    ct.fillStyle = seg.color; ct.fill();
+    ct.strokeStyle = 'rgba(0,0,0,0.12)'; ct.lineWidth = 0.7; ct.stroke();
+    ct.save();
+    ct.rotate(sa + arc / 2);
+    ct.translate(r * 0.63, 0);
+    ct.rotate(Math.PI / 2);
+    ct.fillStyle = 'rgba(255,255,255,0.93)';
+    const fs = Math.max(7, Math.min(9, WS / 32));
+    ct.font = 'bold ' + fs + 'px Arial';
+    ct.textAlign = 'center'; ct.textBaseline = 'middle';
+    seg.label.split('\n').forEach((l, li, arr) => {
+      ct.fillText(l, 0, (li - (arr.length - 1) / 2) * (fs + 2));
+    });
+    ct.restore();
+  });
+  ct.restore();
+  ct.beginPath(); ct.arc(s, s, r, 0, Math.PI * 2);
+  ct.strokeStyle = 'rgba(0,0,0,0.38)'; ct.lineWidth = 4; ct.stroke();
+  ct.beginPath(); ct.arc(s, s, r - 4, 0, Math.PI * 2);
+  ct.strokeStyle = 'rgba(255,255,255,0.14)'; ct.lineWidth = 3; ct.stroke();
+}
+
+function spinWheel() {
+  if (spinning) return;
+  if (spinsLeft <= 0) { showToast('¡Sin giros! Mira un video o suscríbete.'); return; }
+  spinning = true; spinsLeft--; updateSpinsUI();
+  document.getElementById('spinBtn').disabled = true;
+  document.getElementById('rc').classList.remove('show');
+  const extra = (6 + Math.floor(Math.random() * 5)) * 2 * Math.PI;
+  const ri = Math.floor(Math.random() * allSegs.length);
+  const sa = (2 * Math.PI) / allSegs.length;
+  const target = extra + ri * sa;
+  const ms = 5200, t0 = performance.now(), a0 = currentAngle;
+  let lt = a0;
+  function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+  function fr(now) {
+    const el = now - t0, t = Math.min(el / ms, 1), e = ease(t), a = a0 + target * e;
+    currentAngle = a; drawWheel(a);
+    if (a - lt >= sa) { playTick(); lt += sa; }
+    if (t < 1) { requestAnimationFrame(fr); }
+    else {
+      spinning = false;
+      document.getElementById('spinBtn').disabled = false;
+      const na = ((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      const pa = (Math.PI * 1.5 - na + 2 * Math.PI) % (2 * Math.PI);
+      showResult(allSegs[Math.floor(pa / sa) % allSegs.length]);
+    }
+  }
+  requestAnimationFrame(fr);
+}
+
+function showResult(seg) {
+  const rc = document.getElementById('rc');
+  const L = langs[currentLang];
+  rc.style.color = '#fff';
+  if (seg.type === 'permit') {
+    rc.style.background = 'linear-gradient(135deg, #8b0000, #e74c3c)';
+    rc.style.border = '3px solid #ff8080';
+    document.getElementById('rmain').textContent = seg.full;
+    document.getElementById('rsup').textContent = L.permit_support;
+    playWin();
+  } else {
+    rc.style.background = 'rgba(0,0,0,0.70)';
+    rc.style.border = '2px solid rgba(255,255,255,0.18)';
+    document.getElementById('rmain').textContent = seg.full;
+    document.getElementById('rsup').textContent = L.control_support;
+    playCalm();
+  }
+  rc.classList.add('show');
+}
+
+function updateSpinsUI() {
+  document.getElementById('spins-left').textContent = spinsLeft;
+  document.getElementById('spinBtn').disabled = spinsLeft <= 0 || spinning;
+}
+
+/* =====================================================
+   TOAST
+===================================================== */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* =====================================================
+   MODALES
+===================================================== */
+function watchVideo() {
+  document.getElementById('videoModal').classList.add('open');
+  let s = 30;
+  document.getElementById('vidTimer').textContent = s;
+  if (vidInterval) clearInterval(vidInterval);
+  vidInterval = setInterval(() => {
+    s--;
+    document.getElementById('vidTimer').textContent = s;
+    if (s <= 0) {
+      clearInterval(vidInterval); vidInterval = null;
+      closeModal('videoModal');
+      spinsLeft++; updateSpinsUI();
+      showToast('¡+1 giro ganado! 🎉');
+    }
+  }, 1000);
+}
+function openSub() { document.getElementById('subModal').classList.add('open'); }
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  if (vidInterval) { clearInterval(vidInterval); vidInterval = null; }
+}
+function subscribeMock() {
+  closeModal('subModal'); spinsLeft = 999; updateSpinsUI();
+  showToast('¡Suscripción activa! Giros ilimitados. ⭐');
+}
+
+/* =====================================================
+   FLUJO DE PANTALLAS
+===================================================== */
+function show(id) {
+  ['s1','s-confirm','s2'].forEach(s => document.getElementById(s).classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function pushClicked() {
+  const name = document.getElementById('inp-name').value.trim();
+  const dob  = document.getElementById('inp-dob').value;
+  const mail = document.getElementById('inp-mail').value.trim();
+  if (!name || !dob || !mail) { showToast('Completa todos los campos.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { showToast('Correo inválido.'); return; }
+  mockCode = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log('[DEMO] Código de verificación:', mockCode);
+  document.getElementById('confirm-email').textContent = mail;
+  show('s-confirm');
+  showToast('Código enviado — demo: abre la consola F12');
+}
+
+function verifyCode() {
+  const v = document.getElementById('inp-code').value.trim();
+  if (v === mockCode || v === '123456') {
+    show('s2'); initCanvas(); showToast('¡Bienvenido/a! 🎉');
+  } else {
+    showToast('Código incorrecto. Intenta de nuevo.');
+  }
+}
+
+function resendCode() {
+  mockCode = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log('[DEMO] Nuevo código:', mockCode);
+  showToast('Código reenviado — revisa la consola F12');
+}
+
+function goBack() {
+  show('s1');
+  document.getElementById('rc').classList.remove('show');
+}
+
+/* =====================================================
+   SELECTOR DE IDIOMA
+===================================================== */
+function setLang(code) {
+  currentLang = code;
+  const L = langs[code];
+  document.getElementById('langFlag').textContent = L.flag;
+  document.getElementById('langName').textContent = L.name;
+  document.title = L.title;
+
+  const map = {
+    't-title': 'title', 't-title2': 'title', 't-tagline': 'tagline',
+    't-formtitle': 'formtitle', 't-namelabel': 'namelabel',
+    't-doblabel': 'doblabel', 't-maillabel': 'maillabel',
+    't-pushsub': 'pushsub', 't-wheeltitle': 'wheeltitle',
+    't-wheelsub': 'wheelsub', 't-leg1': 'leg1', 't-leg2': 'leg2',
+    't-back': 'back', 't-spinslabel': 'spinslabel', 't-spinssub': 'spinssub',
+    't-vidBtn': 'vidBtn', 't-subBtn': 'subBtn',
+    't-confirmtitle': 'confirmtitle', 't-verifyBtn': 'verifyBtn',
+    't-resend': 'resend', 't-resendlink': 'resendLink'
+  };
+  Object.entries(map).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el && L[key]) el.textContent = L[key];
+  });
+  document.getElementById('inp-name').placeholder = L.nameph;
+  document.getElementById('inp-mail').placeholder = L.mailph;
+  document.getElementById('spinBtn').textContent = L.spinbtn;
+  document.getElementById('verifyBtn').textContent = L.verifyBtn;
+
+  const csub = document.getElementById('t-confirmsub');
+  if (csub) csub.innerHTML = L.confirmsub + ' <strong id="confirm-email"></strong>. ' + L.confirmend;
+
+  document.querySelectorAll('.lang-option').forEach(o => {
+    o.classList.toggle('active', o.dataset.code === code);
+  });
+  document.getElementById('langDropdown').classList.remove('open');
+  document.getElementById('langArrow').style.transform = '';
+}
+
+function buildDropdown() {
+  const dd = document.getElementById('langDropdown');
+  Object.entries(langs).forEach(([code, L]) => {
+    const d = document.createElement('div');
+    d.className = 'lang-option' + (code === currentLang ? ' active' : '');
+    d.dataset.code = code;
+    d.innerHTML = L.flag + ' ' + L.name;
+    d.onclick = () => setLang(code);
+    dd.appendChild(d);
+  });
+  document.getElementById('langTrigger').onclick = () => {
+    const open = document.getElementById('langDropdown').classList.toggle('open');
+    document.getElementById('langArrow').style.transform = open ? 'rotate(180deg)' : '';
+  };
+  document.addEventListener('click', e => {
+    if (!document.getElementById('langWrap').contains(e.target)) {
+      document.getElementById('langDropdown').classList.remove('open');
+      document.getElementById('langArrow').style.transform = '';
+    }
+  });
+}
+
+/* =====================================================
+   INIT
+===================================================== */
+document.getElementById('pushBtn').addEventListener('click', pushClicked);
+document.getElementById('verifyBtn').addEventListener('click', verifyCode);
+window.addEventListener('resize', () => {
+  if (document.getElementById('s2').classList.contains('active')) initCanvas();
+});
+
+buildDropdown();
+initCanvas();
+</script>
+</body>
+</html>
