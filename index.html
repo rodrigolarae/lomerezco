@@ -239,7 +239,21 @@ canvas#wc{border-radius:50%;box-shadow:0 6px 0 rgba(0,0,0,0.35),0 12px 28px rgba
   <div class="modal">
     <h3 id="t-vidtitle">Ver video publicitario</h3>
     <p id="t-vidtext">Mira el video completo para ganar 1 giro extra.</p>
-    <div class="vid-box">▶ Cargando video... <span id="vidTimer" style="margin-left:6px;font-weight:bold;color:#ffcc00">30</span>s</div>
+    <div style="position:relative;background:#000;border-radius:10px;overflow:hidden;margin-bottom:12px">
+      <iframe id="vidFrame" width="100%" height="180"
+        src="https://www.youtube.com/embed/xNQA_o4sW3g?autoplay=1&mute=1&controls=0&rel=0"
+        frameborder="0" allow="autoplay" allowfullscreen style="display:block"></iframe>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:8px 12px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;color:rgba(255,255,255,0.7)">Termina en</span>
+        <span id="vidTimer" style="font-size:16px;font-weight:900;color:#ffcc00">30</span>
+        <span style="font-size:12px;color:rgba(255,255,255,0.7)">segundos</span>
+        <div style="flex:1;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;overflow:hidden">
+          <div id="vidProgress" style="height:100%;background:#ffcc00;width:0%;transition:width 1s linear;border-radius:2px"></div>
+        </div>
+      </div>
+    </div>
+    <div id="vidRewardMsg" style="display:none;text-align:center;color:#22bb22;font-weight:bold;font-size:14px;margin-bottom:10px">¡+1 giro ganado! 🎉</div>
+    <button id="vidSkipBtn" class="modal-btn btn-confirm" style="display:none" onclick="rewardVideo()">Saltar y cobrar giro</button>
     <button class="modal-btn btn-cancel" onclick="closeModal('videoModal')">Cancelar</button>
   </div>
 </div>
@@ -507,6 +521,7 @@ let currentAngle = 0;
 let spinning = false;
 let audioCtx = null;
 let spinsLeft = 3;
+let videosHoy = 0;
 
 let vidInterval = null;
 let WS = 280;
@@ -670,20 +685,77 @@ function showToast(msg) {
    MODALES
 ===================================================== */
 function watchVideo() {
+  if (videosHoy >= 3) {
+    showToast('Ya viste 3 videos hoy. Vuelve mañana.');
+    return;
+  }
   document.getElementById('videoModal').classList.add('open');
+  document.getElementById('vidSkipBtn').style.display = 'none';
+  document.getElementById('vidRewardMsg').style.display = 'none';
+  document.getElementById('vidProgress').style.width = '0%';
+  startVideoCountdown();
+}
+
+function startVideoCountdown() {
   let s = 30;
+  let total = 30;
   document.getElementById('vidTimer').textContent = s;
   if (vidInterval) clearInterval(vidInterval);
   vidInterval = setInterval(() => {
     s--;
     document.getElementById('vidTimer').textContent = s;
+    let pct = ((total - s) / total * 100).toFixed(0);
+    document.getElementById('vidProgress').style.width = pct + '%';
+    if (s <= 5) document.getElementById('vidSkipBtn').style.display = 'block';
     if (s <= 0) {
       clearInterval(vidInterval); vidInterval = null;
-      closeModal('videoModal');
-      spinsLeft++; updateSpinsUI();
-      showToast('¡+1 giro ganado! 🎉');
+      rewardVideo();
     }
   }, 1000);
+}
+
+function rewardVideo() {
+  videosHoy++;
+  spinsLeft++;
+  updateSpinsUI();
+  updateVideosUI();
+  document.getElementById('vidRewardMsg').style.display = 'block';
+  document.getElementById('vidSkipBtn').style.display = 'none';
+  saveVideosHoy();
+  setTimeout(() => closeModal('videoModal'), 1500);
+  showToast('¡+1 giro ganado! 🎉');
+}
+
+function updateVideosUI() {
+  const restantes = 3 - videosHoy;
+  const btn = document.getElementById('t-vidBtn');
+  if (restantes <= 0) {
+    btn.textContent = '✓ Videos de hoy completados';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+  } else {
+    btn.textContent = '▶ Ver video (+1 giro) — ' + restantes + ' restantes';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+}
+
+function saveVideosHoy() {
+  const hoy = new Date().toDateString();
+  localStorage.setItem('videosDate', hoy);
+  localStorage.setItem('videosCount', videosHoy);
+}
+
+function loadVideosHoy() {
+  const hoy = new Date().toDateString();
+  const fecha = localStorage.getItem('videosDate');
+  if (fecha === hoy) {
+    videosHoy = parseInt(localStorage.getItem('videosCount') || '0');
+  } else {
+    videosHoy = 0;
+    saveVideosHoy();
+  }
+  updateVideosUI();
 }
 function openSub() { document.getElementById('subModal').classList.add('open'); }
 function closeModal(id) {
@@ -851,6 +923,10 @@ window.addEventListener('resize', () => {
 
 buildDropdown();
 initCanvas();
+loadVideosHoy();
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
