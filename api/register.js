@@ -1,7 +1,7 @@
 // api/register.js
 // Recibe nombre, fecha, correo → guarda en Supabase → genera código
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Solo aceptar POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método no permitido' });
