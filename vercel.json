@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/", "destination": "/index.html" },
     { "source": "/api/register", "destination": "/API/register.js" },
     { "source": "/api/verify", "destination": "/API/verify.js" }
   ],
