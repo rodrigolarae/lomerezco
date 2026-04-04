@@ -180,6 +180,61 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 6px rgba(255,255,255,0.15),0 0 0 12
   .spins-actions{flex-direction:column;align-items:center}
   .modal{padding:1.2rem}
 }
+
+/* ===== PROGRESO Y STATS ===== */
+.stats-bar{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0.6rem 0}
+.stat-card{background:rgba(0,0,0,0.5);border-radius:12px;padding:10px 8px;text-align:center;border:1px solid rgba(255,255,255,0.1);transition:transform 0.2s}
+.stat-card:active{transform:scale(0.96)}
+.stat-icon{font-size:1.4em;margin-bottom:2px}
+.stat-value{font-size:1.1em;font-weight:900;color:#ffcc00;line-height:1}
+.stat-label{font-size:9px;color:rgba(255,255,255,0.55);margin-top:2px;text-transform:uppercase;letter-spacing:0.04em}
+
+/* ===== RACHA ===== */
+.racha-banner{width:100%;background:linear-gradient(135deg,rgba(255,100,0,0.3),rgba(255,200,0,0.2));border:1px solid rgba(255,150,0,0.4);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin:0.4rem 0}
+.racha-fire{font-size:1.8em;animation:fireAnim 0.8s ease-in-out infinite alternate}
+@keyframes fireAnim{from{transform:scale(1) rotate(-5deg)}to{transform:scale(1.15) rotate(5deg)}}
+.racha-text{flex:1}
+.racha-title{font-size:13px;font-weight:900;color:#ffcc00}
+.racha-sub{font-size:11px;color:rgba(255,255,255,0.7)}
+
+/* ===== LOGROS ===== */
+.logros-section{width:100%;margin:0.5rem 0}
+.logros-title{font-size:12px;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;text-align:center}
+.logros-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.logro-item{background:rgba(0,0,0,0.4);border-radius:10px;padding:8px 4px;text-align:center;border:1px solid rgba(255,255,255,0.08);transition:all 0.3s}
+.logro-item.unlocked{background:rgba(255,204,0,0.15);border-color:rgba(255,204,0,0.4);animation:logroUnlock 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes logroUnlock{from{transform:scale(0.5);opacity:0}to{transform:scale(1);opacity:1}}
+.logro-emoji{font-size:1.5em;filter:grayscale(1);transition:filter 0.3s}
+.logro-item.unlocked .logro-emoji{filter:grayscale(0)}
+.logro-name{font-size:8px;color:rgba(255,255,255,0.5);margin-top:3px;line-height:1.2}
+.logro-item.unlocked .logro-name{color:#ffcc00}
+
+/* ===== MODAL COMPRA ===== */
+.compra-modal .modal{max-width:400px}
+.monto-input{width:100%;padding:14px 16px;border:2px solid rgba(255,204,0,0.4);border-radius:10px;font-size:1.4em;font-weight:900;text-align:center;background:rgba(255,255,255,0.1);color:#fff;letter-spacing:0.05em;margin:12px 0}
+.monto-input::placeholder{color:rgba(255,255,255,0.3);font-size:0.7em;font-weight:400}
+.monto-input:focus{outline:none;border-color:#ffcc00}
+.categoria-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.cat-btn{padding:8px 4px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:#fff;font-size:11px;cursor:pointer;text-align:center;transition:all 0.15s}
+.cat-btn.selected{background:rgba(255,204,0,0.2);border-color:#ffcc00;color:#ffcc00;font-weight:700}
+
+/* ===== RESUMEN MENSUAL ===== */
+.resumen-card{width:100%;background:rgba(0,0,0,0.55);border-radius:16px;padding:1rem;margin:0.4rem 0;border:1px solid rgba(255,255,255,0.08)}
+.resumen-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.resumen-title{font-size:13px;font-weight:700;color:#ffcc00}
+.resumen-mes{font-size:11px;color:rgba(255,255,255,0.5)}
+.resumen-total{text-align:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:10px}
+.resumen-monto{font-size:2em;font-weight:900;color:#e74c3c}
+.resumen-monto-label{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px}
+.resumen-vs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vs-item{background:rgba(255,255,255,0.05);border-radius:8px;padding:8px;text-align:center}
+.vs-emoji{font-size:1.3em}
+.vs-text{font-size:10px;color:rgba(255,255,255,0.7);margin-top:3px;line-height:1.3}
+
+/* ===== BOTÓN ESTOY POR COMPRAR ===== */
+.compra-trigger{width:100%;padding:14px;background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;border:none;border-radius:14px;font-size:1em;font-weight:900;cursor:pointer;margin:0.5rem 0;box-shadow:0 4px 0 #7b241c,0 8px 20px rgba(231,76,60,0.4);transition:transform 0.08s,box-shadow 0.08s;animation:compraPulse 3s ease-in-out infinite}
+.compra-trigger:active{transform:translateY(4px);box-shadow:0 1px 0 #7b241c}
+@keyframes compraPulse{0%,100%{box-shadow:0 4px 0 #7b241c,0 8px 20px rgba(231,76,60,0.4)}50%{box-shadow:0 4px 0 #7b241c,0 8px 30px rgba(231,76,60,0.7)}}
 </style>
 </head>
 <body>
@@ -243,6 +298,40 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 6px rgba(255,255,255,0.15),0 0 0 12
 
   <!-- PANTALLA 3: RULETA -->
   <div id="s2" class="screen">
+
+    <!-- RACHA BANNER -->
+    <div class="racha-banner" id="rachaBanner">
+      <div class="racha-fire">🔥</div>
+      <div class="racha-text">
+        <div class="racha-title" id="rachaTitle">¡Primer día!</div>
+        <div class="racha-sub" id="rachaSub">Sigue resistiendo para construir tu racha</div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-value" id="statDias">0</div>
+        <div class="stat-label">días de racha</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value" id="statAhorro">$0</div>
+        <div class="stat-label">ahorrado</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🧠</div>
+        <div class="stat-value" id="statNivel">Nv.1</div>
+        <div class="stat-label">autocontrol</div>
+      </div>
+    </div>
+
+    <!-- BOTÓN ESTOY POR COMPRAR -->
+    <button class="compra-trigger" onclick="openCompraModal()">
+      🛒 Estoy por comprar algo...
+    </button>
+
     <p class="wheel-title" id="t-wheeltitle">La ruleta decide</p>
     <p class="wheel-sub" id="t-wheelsub">Gira y escucha lo que necesitas hoy</p>
     <div class="wheel-wrap" id="wheelWrap">
@@ -293,6 +382,25 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 6px rgba(255,255,255,0.15),0 0 0 12
       <div style="font-size:12px;font-weight:700;color:#ffcc00;margin-bottom:8px">Mis últimas decisiones</div>
       <div id="historyList"></div>
     </div>
+    <!-- LOGROS -->
+    <div class="logros-section" id="logrosSection" style="display:none">
+      <div class="logros-title">🏆 Mis logros</div>
+      <div class="logros-grid" id="logrosGrid"></div>
+    </div>
+
+    <!-- RESUMEN MENSUAL -->
+    <div class="resumen-card" id="resumenCard" style="display:none">
+      <div class="resumen-header">
+        <span class="resumen-title">📊 Resumen del mes</span>
+        <span class="resumen-mes" id="resumenMes"></span>
+      </div>
+      <div class="resumen-total">
+        <div class="resumen-monto" id="resumenMonto">$0</div>
+        <div class="resumen-monto-label">gastado en compras impulsivas</div>
+      </div>
+      <div class="resumen-vs" id="resumenVs"></div>
+    </div>
+
     <button class="back-btn" onclick="goBack()" id="t-back">Volver al inicio</button>
   </div>
 
@@ -319,6 +427,25 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 6px rgba(255,255,255,0.15),0 0 0 12
     <div id="vidRewardMsg" style="display:none;text-align:center;color:#22bb22;font-weight:bold;font-size:14px;margin-bottom:10px">¡+1 giro ganado! 🎉</div>
     <button id="vidSkipBtn" class="modal-btn btn-confirm" style="display:none" onclick="rewardVideo()">Saltar y cobrar giro</button>
     <button class="modal-btn btn-cancel" onclick="closeModal('videoModal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL: ESTOY POR COMPRAR -->
+<div class="modal-overlay compra-modal" id="compraModal">
+  <div class="modal">
+    <h3>🛒 ¿Cuánto cuesta?</h3>
+    <p>Ingresa el monto antes de decidir. Esto te ayuda a medir tus hábitos.</p>
+    <input class="monto-input" type="number" id="montoInput" placeholder="Ej: 25.990">
+    <div class="categoria-grid">
+      <div class="cat-btn" onclick="selectCat(this,'ropa')">👕 Ropa</div>
+      <div class="cat-btn" onclick="selectCat(this,'tech')">📱 Tech</div>
+      <div class="cat-btn" onclick="selectCat(this,'comida')">🍔 Comida</div>
+      <div class="cat-btn" onclick="selectCat(this,'entret')">🎮 Entret.</div>
+      <div class="cat-btn" onclick="selectCat(this,'hogar')">🏠 Hogar</div>
+      <div class="cat-btn" onclick="selectCat(this,'otro')">📦 Otro</div>
+    </div>
+    <button class="modal-btn btn-confirm" onclick="confirmarCompraModal()" style="background:#e74c3c">Girar la ruleta ahora</button>
+    <button class="modal-btn btn-cancel" onclick="closeModal('compraModal')">Cancelar</button>
   </div>
 </div>
 
@@ -853,6 +980,13 @@ function reflexion(decision) {
   // Guardar en historial
   saveHistory(lastSegFull, lastSegType, decision);
   renderHistory();
+
+  // Actualizar stats
+  const resistio = decision === 'no' || (lastSegType === 'permit' && decision === 'no');
+  const realmente_resistio = decision === 'no';
+  registrarDecision(montoPendiente, categoriaSeleccionada, realmente_resistio);
+  if (realmente_resistio) updateRacha(true);
+  montoPendiente = 0;
 }
 
 function saveHistory(frase, tipo, decision) {
@@ -1180,6 +1314,226 @@ window.addEventListener('resize', () => {
 buildDropdown();
 initCanvas();
 loadVideosHoy();
+initStats();
+
+/* =====================================================
+   SISTEMA DE PROGRESO, LOGROS Y COMPRAS
+===================================================== */
+
+const LOGROS_DEF = [
+  { id:'primer_auto', emoji:'🌱', name:'Primer autocontrol', check: s => s.totalResistidas >= 1 },
+  { id:'cinco_resist', emoji:'💪', name:'5 compras evitadas', check: s => s.totalResistidas >= 5 },
+  { id:'diez_resist', emoji:'🏆', name:'10 compras evitadas', check: s => s.totalResistidas >= 10 },
+  { id:'racha3', emoji:'🔥', name:'Racha de 3 días', check: s => s.rachaMax >= 3 },
+  { id:'racha7', emoji:'⚡', name:'Racha de 7 días', check: s => s.rachaMax >= 7 },
+  { id:'ahorro10k', emoji:'💰', name:'$10.000 ahorrados', check: s => s.totalAhorro >= 10000 },
+  { id:'ahorro50k', emoji:'💎', name:'$50.000 ahorrados', check: s => s.totalAhorro >= 50000 },
+  { id:'oferta_resist', emoji:'🎯', name:'Resististe una oferta', check: s => s.ofertaResistida >= 1 },
+];
+
+function getStats() {
+  return JSON.parse(localStorage.getItem('lm_stats') || JSON.stringify({
+    rachaActual: 0, rachaMax: 0, ultimoDia: null,
+    totalResistidas: 0, totalCompradas: 0,
+    totalAhorro: 0, totalGastado: 0,
+    ofertaResistida: 0,
+    logros: [],
+    compras: []
+  }));
+}
+
+function saveStats(s) {
+  localStorage.setItem('lm_stats', JSON.stringify(s));
+}
+
+function updateRacha(resistio) {
+  const s = getStats();
+  const hoy = new Date().toDateString();
+  const ayer = new Date(Date.now() - 86400000).toDateString();
+
+  if (resistio) {
+    if (s.ultimoDia === ayer) {
+      s.rachaActual++;
+    } else if (s.ultimoDia !== hoy) {
+      s.rachaActual = 1;
+    }
+    s.ultimoDia = hoy;
+    if (s.rachaActual > s.rachaMax) s.rachaMax = s.rachaActual;
+  }
+  saveStats(s);
+  renderStats();
+}
+
+function registrarDecision(monto, categoria, resistio) {
+  const s = getStats();
+  if (resistio) {
+    s.totalResistidas++;
+    if (monto) s.totalAhorro += monto;
+  } else {
+    s.totalCompradas++;
+    if (monto) {
+      s.totalGastado += monto;
+      s.compras.push({ monto, categoria, fecha: new Date().toISOString() });
+    }
+  }
+  saveStats(s);
+  checkLogros();
+  renderStats();
+  renderResumen();
+}
+
+function checkLogros() {
+  const s = getStats();
+  let nuevos = [];
+  LOGROS_DEF.forEach(l => {
+    if (!s.logros.includes(l.id) && l.check(s)) {
+      s.logros.push(l.id);
+      nuevos.push(l);
+    }
+  });
+  saveStats(s);
+  if (nuevos.length) {
+    nuevos.forEach(l => {
+      showToast('🏆 Logro desbloqueado: ' + l.name);
+    });
+    renderLogros();
+  }
+}
+
+function renderStats() {
+  const s = getStats();
+
+  // Racha
+  document.getElementById('statDias').textContent = s.rachaActual;
+  const rachaTitle = document.getElementById('rachaTitle');
+  const rachaSub = document.getElementById('rachaSub');
+  if (s.rachaActual === 0) {
+    rachaTitle.textContent = '¡Empieza tu racha hoy!';
+    rachaSub.textContent = 'Resiste una compra impulsiva para comenzar';
+  } else if (s.rachaActual < 3) {
+    rachaTitle.textContent = '🔥 ' + s.rachaActual + ' día' + (s.rachaActual > 1 ? 's' : '') + ' de racha';
+    rachaSub.textContent = 'Sigue así, ¡vas muy bien!';
+  } else if (s.rachaActual < 7) {
+    rachaTitle.textContent = '🔥 ' + s.rachaActual + ' días consecutivos';
+    rachaSub.textContent = '¡Increíble disciplina! Casi una semana.';
+  } else {
+    rachaTitle.textContent = '🔥 ' + s.rachaActual + ' días — ¡Leyenda!';
+    rachaSub.textContent = 'Estás en el top de usuarios. ¡Asombroso!';
+  }
+
+  // Ahorro
+  const ahorro = s.totalAhorro;
+  document.getElementById('statAhorro').textContent = ahorro >= 1000
+    ? '$' + Math.round(ahorro/1000) + 'K'
+    : '$' + ahorro.toLocaleString('es-CL');
+
+  // Nivel autocontrol
+  const total = s.totalResistidas + s.totalCompradas;
+  const pct = total > 0 ? Math.round(s.totalResistidas / total * 100) : 0;
+  let nivel = 'Nv.1';
+  if (pct >= 30) nivel = 'Nv.2';
+  if (pct >= 50) nivel = 'Nv.3';
+  if (pct >= 70) nivel = 'Nv.4';
+  if (pct >= 90) nivel = 'Nv.5';
+  document.getElementById('statNivel').textContent = nivel;
+}
+
+function renderLogros() {
+  const s = getStats();
+  const grid = document.getElementById('logrosGrid');
+  const section = document.getElementById('logrosSection');
+  section.style.display = 'block';
+  grid.innerHTML = LOGROS_DEF.map(l => {
+    const done = s.logros.includes(l.id);
+    return '<div class="logro-item ' + (done ? 'unlocked' : '') + '" title="' + l.name + '">'
+      + '<div class="logro-emoji">' + l.emoji + '</div>'
+      + '<div class="logro-name">' + l.name + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function renderResumen() {
+  const s = getStats();
+  if (s.compras.length === 0 && s.totalGastado === 0) return;
+
+  const card = document.getElementById('resumenCard');
+  card.style.display = 'block';
+
+  const now = new Date();
+  document.getElementById('resumenMes').textContent =
+    now.toLocaleDateString('es-CL', { month:'long', year:'numeric' });
+
+  // Calcular gasto del mes actual
+  const mesActual = now.getMonth() + '-' + now.getFullYear();
+  const gastoMes = s.compras
+    .filter(c => {
+      const d = new Date(c.fecha);
+      return (d.getMonth() + '-' + d.getFullYear()) === mesActual;
+    })
+    .reduce((sum, c) => sum + c.monto, 0);
+
+  document.getElementById('resumenMonto').textContent =
+    '$' + Math.round(gastoMes).toLocaleString('es-CL');
+
+  // Comparativas
+  const comparativas = [
+    { emoji:'✈️', text: 'pasajes ida y vuelta a Mendoza', valor: 80000 },
+    { emoji:'🍕', text: 'pizzas con los amigos', valor: 12000 },
+    { emoji:'📚', text: 'libros que cambiarían tu vida', valor: 15000 },
+    { emoji:'💆', text: 'sesiones de masaje relajante', valor: 25000 },
+    { emoji:'🎬', text: 'meses de Netflix', valor: 8990 },
+    { emoji:'☕', text: 'cafés especiales con alguien', valor: 4500 },
+  ];
+
+  if (gastoMes > 0) {
+    const vs = document.getElementById('resumenVs');
+    const dos = comparativas.sort(() => Math.random() - 0.5).slice(0, 2);
+    vs.innerHTML = dos.map(c => {
+      const cant = Math.floor(gastoMes / c.valor);
+      if (cant < 1) return '';
+      return '<div class="vs-item">'
+        + '<div class="vs-emoji">' + c.emoji + '</div>'
+        + '<div class="vs-text">Equivale a <strong>' + cant + '</strong> ' + c.text + '</div>'
+        + '</div>';
+    }).filter(Boolean).join('');
+  }
+}
+
+/* ===== MODAL COMPRA ===== */
+let categoriaSeleccionada = 'otro';
+let montoPendiente = 0;
+
+function openCompraModal() {
+  document.getElementById('montoInput').value = '';
+  categoriaSeleccionada = 'otro';
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('compraModal').classList.add('open');
+}
+
+function selectCat(el, cat) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  categoriaSeleccionada = cat;
+}
+
+function confirmarCompraModal() {
+  const val = parseFloat(document.getElementById('montoInput').value.replace(/\./g,'').replace(',','.'));
+  montoPendiente = isNaN(val) ? 0 : val;
+  closeModal('compraModal');
+  if (spinsLeft > 0) {
+    spinWheel();
+  } else {
+    showToast('Sin giros disponibles. ¡Ve un video para ganar uno!');
+  }
+}
+
+/* ===== INIT STATS ===== */
+function initStats() {
+  renderStats();
+  renderLogros();
+  renderResumen();
+}
+
 </script>
 </body>
 </html>
