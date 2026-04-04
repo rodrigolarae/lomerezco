@@ -1,6 +1,10 @@
 {
+  "rewrites": [
+    { "source": "/api/register", "destination": "/API/register.js" },
+    { "source": "/api/verify", "destination": "/API/verify.js" }
+  ],
   "functions": {
-    "api/*.js": {
+    "API/*.js": {
       "maxDuration": 10
     }
   }
