@@ -1,25 +1,14 @@
-// api/register.js
-// Recibe nombre, fecha, correo → guarda en Supabase → genera código
-
 module.exports = async function handler(req, res) {
-  // Solo aceptar POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método no permitido' });
   }
-
   const { nombre, fecha_nacimiento, correo } = req.body;
-
-  // Validaciones básicas
   if (!nombre || !fecha_nacimiento || !correo) {
     return res.status(400).json({ error: 'Faltan campos obligatorios' });
   }
-
-  // Generar código de 6 dígitos
   const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-  const expira = new Date(Date.now() + 10 * 60 * 1000); // expira en 10 min
-
-  // Guardar en Supabase
-  const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/usuarios`, {
+  const expira = new Date(Date.now() + 10 * 60 * 1000);
+  const dbRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/usuarios`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -27,26 +16,28 @@ module.exports = async function handler(req, res) {
       'Authorization': `Bearer ${process.env.SUPABASE_KEY}`,
       'Prefer': 'resolution=merge-duplicates'
     },
-    body: JSON.stringify({
-      nombre,
-      fecha_nacimiento,
-      correo,
-      codigo_verificacion: codigo,
-      codigo_expira: expira.toISOString(),
-      verificado: false
-    })
+    body: JSON.stringify({ nombre, fecha_nacimiento, correo, codigo_verificacion: codigo, codigo_expira: expira.toISOString(), verificado: false })
   });
-
-  if (!response.ok) {
-    const err = await response.text();
+  if (!dbRes.ok) {
+    const err = await dbRes.text();
     return res.status(500).json({ error: 'Error guardando usuario', detalle: err });
   }
-
-  // Enviar correo con Resend (lo activamos en el Paso 3)
-  // Por ahora solo devolvemos el código para pruebas
-  return res.status(200).json({
-    ok: true,
-    mensaje: 'Usuario registrado. Código generado.',
-    codigo_demo: codigo  // ← esto lo quitamos en producción
+  const emailRes = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.RESEND_KEY}`
+    },
+    body: JSON.stringify({
+      from: 'lomerezco <onboarding@resend.dev>',
+      to: correo,
+      subject: 'Tu código de acceso — lomerezco.cl',
+      html: `<div style="font-family:Arial;max-width:480px;margin:0 auto;background:#111;color:#fff;border-radius:16px;overflow:hidden"><div style="background:linear-gradient(135deg,#ffcc00,#ff0066);padding:32px;text-align:center"><h1 style="margin:0;color:#fff">lomerezco.cl</h1></div><div style="padding:32px;text-align:center"><p>Hola <strong>${nombre}</strong>, aquí está tu código:</p><div style="background:rgba(255,204,0,0.15);border:2px solid #ffcc00;border-radius:12px;padding:24px;margin:24px 0"><span style="font-size:3em;font-weight:900;letter-spacing:0.3em;color:#ffcc00">${codigo}</span></div><p style="font-size:13px;color:rgba(255,255,255,0.5)">Expira en 10 minutos.</p></div></div>`
+    })
   });
-}
+  if (!emailRes.ok) {
+    const err = await emailRes.text();
+    return res.status(500).json({ error: 'Error enviando correo', detalle: err });
+  }
+  return res.status(200).json({ ok: true, mensaje: 'Código enviado a tu correo' });
+};
