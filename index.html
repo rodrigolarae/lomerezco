@@ -1010,13 +1010,13 @@ function renderHistory() {
   list.innerHTML = hist.map(h => {
     const dot = h.tipo === 'permit' ? '#e74c3c' : '#27ae60';
     const icon = h.decision === 'si' ? '🛍️' : '✨';
-    return \`<div class="history-item">
+    return `<div class="history-item">
       <div class="history-dot" style="background:\${dot}"></div>
       <div style="flex:1;overflow:hidden">
         <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(255,255,255,0.9)">\${h.frase}</div>
         <div style="color:rgba(255,255,255,0.4);font-size:10px">\${h.fecha} · \${icon} \${h.decision === 'si' ? 'Compré' : 'No compré'}</div>
       </div>
-    </div>\`;
+    </div>`;
   }).join('');
 }
 
