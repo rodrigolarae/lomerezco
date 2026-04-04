@@ -82,9 +82,47 @@ h1{font-size:clamp(1.6em,5vw,2.2em);color:#fff;text-shadow:2px 3px 0 rgba(0,0,0,
 .wheel-title{font-size:clamp(1.2em,4vw,1.6em);color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,0.4);margin:0.7rem 0 0.1rem;text-align:center}
 .wheel-sub{font-size:clamp(0.75em,2.5vw,0.85em);color:rgba(255,255,255,0.82);text-shadow:1px 1px 0 rgba(0,0,0,0.3);margin-bottom:0.6rem;text-align:center}
 .wheel-wrap{position:relative;margin:0 auto 0.4rem}
-.pointer{position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:26px solid #fff;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));z-index:10}
-canvas#wc{border-radius:50%;box-shadow:0 6px 0 rgba(0,0,0,0.35),0 12px 28px rgba(0,0,0,0.4);display:block}
-.wcenter{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#fff,#ccc);box-shadow:0 2px 6px rgba(0,0,0,0.5);z-index:5}
+.wheel-outer{position:relative;display:inline-block}
+.wheel-glow{position:absolute;inset:-8px;border-radius:50%;background:conic-gradient(#ff0066,#ffcc00,#00ff88,#0066ff,#ff0066);animation:glowSpin 4s linear infinite;opacity:0.35;filter:blur(8px);z-index:0}
+.pointer{position:absolute;top:-22px;left:50%;transform:translateX(-50%);z-index:20;filter:drop-shadow(0 0 8px #ffcc00)}
+.pointer svg{display:block}
+canvas#wc{border-radius:50%;box-shadow:0 0 0 6px rgba(255,255,255,0.15),0 0 0 12px rgba(255,204,0,0.1),0 8px 0 rgba(0,0,0,0.5),0 16px 40px rgba(0,0,0,0.6);display:block;position:relative;z-index:1}
+.wcenter{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff 0%,#e0e0e0 40%,#aaa 100%);box-shadow:0 0 0 4px rgba(255,255,255,0.3),0 4px 12px rgba(0,0,0,0.6);z-index:10}
+@keyframes glowSpin{to{transform:rotate(360deg)}}
+.wheel-spinning .wheel-glow{opacity:0.7;filter:blur(6px)}
+
+/* CONFETTI */
+.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:1000;overflow:hidden}
+.confetti-piece{position:absolute;width:10px;height:10px;opacity:0}
+
+/* FRASE RESULTADO MEJORADA */
+.result-card{width:100%;border-radius:20px;padding:0;text-align:center;margin:0.4rem 0;display:none;overflow:hidden}
+.result-card.show{display:block;animation:resultPop 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes resultPop{from{transform:scale(0.5) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.result-inner{padding:1.4rem 1.1rem}
+.result-emoji{font-size:2.5em;margin-bottom:0.4rem;animation:emojiPop 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both}
+@keyframes emojiPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.result-main{font-size:clamp(1.1em,4vw,1.5em);font-weight:900;line-height:1.2;margin-bottom:0.5rem;text-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.result-support{font-size:clamp(0.8em,2.5vw,0.9em);line-height:1.55;opacity:0.92;margin-bottom:1rem}
+.result-action-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 0.5rem 1rem}
+.action-btn{flex:1;min-width:120px;padding:10px 16px;border-radius:12px;border:none;font-size:13px;font-weight:700;cursor:pointer;transition:transform 0.1s,opacity 0.15s;line-height:1.3}
+.action-btn:active{transform:scale(0.96)}
+.action-btn-yes{background:rgba(255,255,255,0.2);color:#fff;border:2px solid rgba(255,255,255,0.4)}
+.action-btn-no{background:rgba(255,255,255,0.95);color:#333}
+
+/* PANTALLA REFLEXIÓN POST-COMPRA */
+.reflection-card{width:100%;border-radius:20px;padding:1.4rem 1.1rem;text-align:center;margin:0.4rem 0;display:none;animation:resultPop 0.5s cubic-bezier(0.34,1.56,0.64,1);color:#fff}
+.reflection-card.show{display:block}
+.reflection-emoji{font-size:3em;margin-bottom:0.5rem}
+.reflection-title{font-size:1.3em;font-weight:900;margin-bottom:0.5rem}
+.reflection-text{font-size:0.9em;line-height:1.6;opacity:0.9}
+
+/* HISTORIAL */
+.history-btn{margin-top:0.4rem;padding:6px 18px;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.25);border-radius:20px;font-size:11px;cursor:pointer}
+.history-panel{width:100%;background:rgba(0,0,0,0.6);border-radius:16px;padding:1rem;margin-top:0.5rem;display:none;color:#fff}
+.history-panel.show{display:block}
+.history-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.08);font-size:12px}
+.history-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* ===== LEYENDA ===== */
 .legend{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:0.3rem 0;width:100%}
@@ -208,10 +246,19 @@ canvas#wc{border-radius:50%;box-shadow:0 6px 0 rgba(0,0,0,0.35),0 12px 28px rgba
     <p class="wheel-title" id="t-wheeltitle">La ruleta decide</p>
     <p class="wheel-sub" id="t-wheelsub">Gira y escucha lo que necesitas hoy</p>
     <div class="wheel-wrap" id="wheelWrap">
-      <div class="pointer"></div>
-      <canvas id="wc"></canvas>
-      <div class="wcenter"></div>
+      <div class="wheel-outer" id="wheelOuter">
+        <div class="wheel-glow"></div>
+        <div class="pointer">
+          <svg width="28" height="36" viewBox="0 0 28 36">
+            <polygon points="14,2 26,34 14,28 2,34" fill="#ffcc00" stroke="#ff6600" stroke-width="1.5"/>
+            <circle cx="14" cy="28" r="4" fill="#fff" stroke="#ffcc00" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <canvas id="wc"></canvas>
+        <div class="wcenter"></div>
+      </div>
     </div>
+    <div class="confetti-container" id="confettiContainer"></div>
     <div class="legend">
       <div class="li"><div class="ld" style="background:#e74c3c"></div><span id="t-leg1">Compra sin culpa (10)</span></div>
       <div class="li"><div class="ld" style="background:#27ae60"></div><span id="t-leg2">Autocontrol (40)</span></div>
@@ -226,8 +273,25 @@ canvas#wc{border-radius:50%;box-shadow:0 6px 0 rgba(0,0,0,0.35),0 12px 28px rgba
     </div>
     <button class="spin-btn" id="spinBtn" onclick="spinWheel()">GIRAR</button>
     <div class="result-card" id="rc">
-      <div class="result-main" id="rmain"></div>
-      <div class="result-support" id="rsup"></div>
+      <div class="result-inner">
+        <div class="result-emoji" id="remoji"></div>
+        <div class="result-main" id="rmain"></div>
+        <div class="result-support" id="rsup"></div>
+        <div class="result-action-btns" id="ractBtns" style="display:none">
+          <button class="action-btn action-btn-yes" id="btnSiCompre" onclick="reflexion('si')"></button>
+          <button class="action-btn action-btn-no" id="btnNoCompre" onclick="reflexion('no')"></button>
+        </div>
+      </div>
+    </div>
+    <div class="reflection-card" id="reflectionCard">
+      <div class="reflection-emoji" id="reflEmoji"></div>
+      <div class="reflection-title" id="reflTitle"></div>
+      <div class="reflection-text" id="reflText"></div>
+    </div>
+    <button class="history-btn" onclick="toggleHistory()">📊 Ver mi historial</button>
+    <div class="history-panel" id="historyPanel">
+      <div style="font-size:12px;font-weight:700;color:#ffcc00;margin-bottom:8px">Mis últimas decisiones</div>
+      <div id="historyList"></div>
     </div>
     <button class="back-btn" onclick="goBack()" id="t-back">Volver al inicio</button>
   </div>
@@ -241,7 +305,7 @@ canvas#wc{border-radius:50%;box-shadow:0 6px 0 rgba(0,0,0,0.35),0 12px 28px rgba
     <p id="t-vidtext">Mira el video completo para ganar 1 giro extra.</p>
     <div style="position:relative;background:#000;border-radius:10px;overflow:hidden;margin-bottom:12px">
       <iframe id="vidFrame" width="100%" height="180"
-        src="https://www.youtube.com/embed/YVVmSHSAZMM?autoplay=1&mute=1&controls=0&rel=0"
+        src="https://www.youtube.com/embed/xNQA_o4sW3g?autoplay=1&mute=1&controls=0&rel=0"
         frameborder="0" allow="autoplay" allowfullscreen style="display:block"></iframe>
       <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:8px 12px;display:flex;align-items:center;gap:10px">
         <span style="font-size:12px;color:rgba(255,255,255,0.7)">Termina en</span>
@@ -589,33 +653,82 @@ function initCanvas() {
 function drawWheel(angle) {
   const cv = document.getElementById('wc');
   const ct = cv.getContext('2d');
-  const s = WS / 2, r = s - 3;
+  const s = WS / 2, r = s - 4;
   ct.clearRect(0, 0, WS, WS);
   const n = allSegs.length, arc = (2 * Math.PI) / n;
+
   ct.save(); ct.translate(s, s); ct.rotate(angle);
   allSegs.forEach((seg, i) => {
     const sa = i * arc - Math.PI / 2, ea = sa + arc;
+
+    // Sector con gradiente
+    const grad = ct.createRadialGradient(0, 0, r * 0.2, 0, 0, r);
+    const base = seg.color;
+    grad.addColorStop(0, lightenColor(base, 40));
+    grad.addColorStop(1, base);
     ct.beginPath(); ct.moveTo(0,0); ct.arc(0, 0, r, sa, ea); ct.closePath();
-    ct.fillStyle = seg.color; ct.fill();
-    ct.strokeStyle = 'rgba(0,0,0,0.12)'; ct.lineWidth = 0.7; ct.stroke();
+    ct.fillStyle = grad; ct.fill();
+
+    // Borde brillante entre sectores
+    ct.strokeStyle = 'rgba(255,255,255,0.18)'; ct.lineWidth = 1; ct.stroke();
+
+    // Highlight exterior del sector
+    ct.save();
+    ct.beginPath(); ct.moveTo(0,0); ct.arc(0,0,r,sa,ea); ct.closePath();
+    ct.clip();
+    ct.beginPath(); ct.arc(0,0,r,sa,sa+arc*0.3);
+    ct.strokeStyle='rgba(255,255,255,0.25)'; ct.lineWidth=r*0.15; ct.stroke();
+    ct.restore();
+
+    // Texto
     ct.save();
     ct.rotate(sa + arc / 2);
-    ct.translate(r * 0.63, 0);
+    ct.translate(r * 0.64, 0);
     ct.rotate(Math.PI / 2);
-    ct.fillStyle = 'rgba(255,255,255,0.93)';
     const fs = Math.max(7, Math.min(9, WS / 32));
     ct.font = 'bold ' + fs + 'px Arial';
     ct.textAlign = 'center'; ct.textBaseline = 'middle';
+    // Sombra texto
+    ct.shadowColor = 'rgba(0,0,0,0.6)'; ct.shadowBlur = 3;
+    ct.fillStyle = '#fff';
     seg.label.split('\n').forEach((l, li, arr) => {
       ct.fillText(l, 0, (li - (arr.length - 1) / 2) * (fs + 2));
     });
+    ct.shadowBlur = 0;
     ct.restore();
   });
   ct.restore();
+
+  // Aro exterior dorado 3D
+  const rimGrad = ct.createLinearGradient(0, 0, WS, WS);
+  rimGrad.addColorStop(0, '#fff7aa');
+  rimGrad.addColorStop(0.3, '#ffcc00');
+  rimGrad.addColorStop(0.7, '#ff9900');
+  rimGrad.addColorStop(1, '#fff7aa');
+  ct.beginPath(); ct.arc(s, s, r + 2, 0, Math.PI * 2);
+  ct.strokeStyle = rimGrad; ct.lineWidth = 7; ct.stroke();
+
+  // Sombra interior
   ct.beginPath(); ct.arc(s, s, r, 0, Math.PI * 2);
-  ct.strokeStyle = 'rgba(0,0,0,0.38)'; ct.lineWidth = 4; ct.stroke();
-  ct.beginPath(); ct.arc(s, s, r - 4, 0, Math.PI * 2);
-  ct.strokeStyle = 'rgba(255,255,255,0.14)'; ct.lineWidth = 3; ct.stroke();
+  ct.strokeStyle = 'rgba(0,0,0,0.5)'; ct.lineWidth = 2; ct.stroke();
+
+  // Destellos en el aro
+  for(let d = 0; d < 12; d++) {
+    const a = (d / 12) * Math.PI * 2;
+    const x = s + (r + 3) * Math.cos(a);
+    const y = s + (r + 3) * Math.sin(a);
+    ct.beginPath(); ct.arc(x, y, 3, 0, Math.PI * 2);
+    ct.fillStyle = d % 2 === 0 ? '#ffcc00' : '#fff';
+    ct.fill();
+  }
+}
+
+function lightenColor(hex, amt) {
+  const num = parseInt(hex.replace('#',''), 16);
+  const r = Math.min(255, (num >> 16) + amt);
+  const g = Math.min(255, ((num >> 8) & 0xff) + amt);
+  const b = Math.min(255, (num & 0xff) + amt);
+  return '#' + ((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
 }
 
 function spinWheel() {
@@ -624,6 +737,9 @@ function spinWheel() {
   spinning = true; spinsLeft--; updateSpinsUI();
   document.getElementById('spinBtn').disabled = true;
   document.getElementById('rc').classList.remove('show');
+  document.getElementById('reflectionCard').classList.remove('show');
+  document.getElementById('ractBtns').style.display = 'none';
+  document.getElementById('wheelOuter').classList.add('wheel-spinning');
   const extra = (6 + Math.floor(Math.random() * 5)) * 2 * Math.PI;
   const ri = Math.floor(Math.random() * allSegs.length);
   const sa = (2 * Math.PI) / allSegs.length;
@@ -639,6 +755,7 @@ function spinWheel() {
     else {
       spinning = false;
       document.getElementById('spinBtn').disabled = false;
+      document.getElementById('wheelOuter').classList.remove('wheel-spinning');
       const na = ((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
       const pa = (Math.PI * 1.5 - na + 2 * Math.PI) % (2 * Math.PI);
       showResult(allSegs[Math.floor(pa / sa) % allSegs.length]);
@@ -647,24 +764,133 @@ function spinWheel() {
   requestAnimationFrame(fr);
 }
 
+const permitEmojis = ['🛍️','💸','🎉','✨','🥳','💝','🎊','👑'];
+const controlEmojis = ['💡','🌱','💪','🧘','⭐','🎯','🔑','💎'];
+
 function showResult(seg) {
   const rc = document.getElementById('rc');
   const L = langs[currentLang];
   rc.style.color = '#fff';
+
+  document.getElementById('reflectionCard').classList.remove('show');
+  document.getElementById('historyPanel').classList.remove('show');
+
   if (seg.type === 'permit') {
-    rc.style.background = 'linear-gradient(135deg, #8b0000, #e74c3c)';
-    rc.style.border = '3px solid #ff8080';
+    rc.style.background = 'linear-gradient(160deg,#7b0000 0%,#c0392b 40%,#e74c3c 100%)';
+    rc.style.border = '2px solid rgba(255,150,150,0.4)';
+    rc.style.boxShadow = '0 0 30px rgba(231,76,60,0.5)';
+    document.getElementById('remoji').textContent = permitEmojis[Math.floor(Math.random()*permitEmojis.length)];
     document.getElementById('rmain').textContent = seg.full;
     document.getElementById('rsup').textContent = L.permit_support;
+    document.getElementById('btnSiCompre').textContent = '🛍️ Sí, lo compré';
+    document.getElementById('btnNoCompre').textContent = '💪 Decidí esperar';
     playWin();
+    launchConfetti();
+    setTimeout(() => document.getElementById('ractBtns').style.display = 'flex', 1500);
   } else {
-    rc.style.background = 'rgba(0,0,0,0.70)';
-    rc.style.border = '2px solid rgba(255,255,255,0.18)';
+    rc.style.background = 'linear-gradient(160deg,rgba(0,0,0,0.8) 0%,rgba(30,30,60,0.9) 100%)';
+    rc.style.border = '2px solid rgba(255,255,255,0.15)';
+    rc.style.boxShadow = '0 8px 32px rgba(0,0,0,0.4)';
+    document.getElementById('remoji').textContent = controlEmojis[Math.floor(Math.random()*controlEmojis.length)];
     document.getElementById('rmain').textContent = seg.full;
     document.getElementById('rsup').textContent = L.control_support;
+    document.getElementById('btnSiCompre').textContent = '🛍️ Igual lo compré';
+    document.getElementById('btnNoCompre').textContent = '✨ No lo compré hoy';
     playCalm();
+    setTimeout(() => document.getElementById('ractBtns').style.display = 'flex', 1500);
   }
   rc.classList.add('show');
+  lastSegType = seg.type;
+  lastSegFull = seg.full;
+}
+
+let lastSegType = '';
+let lastSegFull = '';
+
+function reflexion(decision) {
+  document.getElementById('ractBtns').style.display = 'none';
+  const isPermit = lastSegType === 'permit';
+  const ref = document.getElementById('reflectionCard');
+
+  const msgs = {
+    permit_si: {
+      emoji: '🎉',
+      title: '¡Lo disfrutaste y eso está bien!',
+      text: 'Merecerse algo lindo es parte de vivir. La clave es que fue una decisión consciente, no un impulso ciego. ¡Disfrútalo!',
+      bg: 'linear-gradient(160deg,#1a472a,#27ae60)'
+    },
+    permit_no: {
+      emoji: '💪',
+      title: '¡Qué fortaleza la tuya!',
+      text: 'La ruleta te dio el permiso y aún así elegiste esperar. Eso dice mucho de ti. Tu futuro yo ya te está agradeciendo.',
+      bg: 'linear-gradient(160deg,#1a3a5c,#2980b9)'
+    },
+    control_si: {
+      emoji: '🌱',
+      title: 'Está bien, todos lo hacemos',
+      text: 'Lo importante no es la compra, sino que te diste cuenta. Esa consciencia es el primer paso. La próxima vez será más fácil.',
+      bg: 'linear-gradient(160deg,#4a1942,#8e44ad)'
+    },
+    control_no: {
+      emoji: '⭐',
+      title: '¡Eso es autocontrol real!',
+      text: 'Sentiste el impulso, lo miraste de frente y elegiste diferente. Cada vez que haces esto, construyes tu libertad financiera.',
+      bg: 'linear-gradient(160deg,#1a472a,#27ae60)'
+    }
+  };
+
+  const key = isPermit
+    ? (decision === 'si' ? 'permit_si' : 'permit_no')
+    : (decision === 'si' ? 'control_si' : 'control_no');
+
+  const m = msgs[key];
+  ref.style.background = m.bg;
+  document.getElementById('reflEmoji').textContent = m.emoji;
+  document.getElementById('reflTitle').textContent = m.title;
+  document.getElementById('reflText').textContent = m.text;
+  ref.classList.add('show');
+
+  // Guardar en historial
+  saveHistory(lastSegFull, lastSegType, decision);
+  renderHistory();
+}
+
+function saveHistory(frase, tipo, decision) {
+  const key = 'lomerezco_history';
+  let hist = JSON.parse(localStorage.getItem(key) || '[]');
+  hist.unshift({
+    frase, tipo, decision,
+    fecha: new Date().toLocaleDateString('es-CL', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
+  });
+  if (hist.length > 20) hist = hist.slice(0, 20);
+  localStorage.setItem(key, JSON.stringify(hist));
+}
+
+function renderHistory() {
+  const hist = JSON.parse(localStorage.getItem('lomerezco_history') || '[]');
+  const list = document.getElementById('historyList');
+  if (!hist.length) {
+    list.innerHTML = '<p style="font-size:12px;color:rgba(255,255,255,0.4);text-align:center">Aún no hay registros</p>';
+    return;
+  }
+  list.innerHTML = hist.map(h => {
+    const dot = h.tipo === 'permit' ? '#e74c3c' : '#27ae60';
+    const icon = h.decision === 'si' ? '🛍️' : '✨';
+    return \`<div class="history-item">
+      <div class="history-dot" style="background:\${dot}"></div>
+      <div style="flex:1;overflow:hidden">
+        <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(255,255,255,0.9)">\${h.frase}</div>
+        <div style="color:rgba(255,255,255,0.4);font-size:10px">\${h.fecha} · \${icon} \${h.decision === 'si' ? 'Compré' : 'No compré'}</div>
+      </div>
+    </div>\`;
+  }).join('');
+}
+
+function toggleHistory() {
+  const p = document.getElementById('historyPanel');
+  const showing = p.classList.contains('show');
+  if (!showing) renderHistory();
+  p.classList.toggle('show');
 }
 
 function updateSpinsUI() {
@@ -915,6 +1141,36 @@ function buildDropdown() {
 /* =====================================================
    INIT
 ===================================================== */
+function launchConfetti() {
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  const colors = ['#ff0066','#ffcc00','#00ff88','#0099ff','#ff6600','#ff00ff','#fff'];
+  for (let i = 0; i < 80; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    const size = Math.random() * 8 + 6;
+    const isCircle = Math.random() > 0.5;
+    p.style.cssText = [
+      'width:' + size + 'px',
+      'height:' + size + 'px',
+      'background:' + colors[Math.floor(Math.random()*colors.length)],
+      'border-radius:' + (isCircle ? '50%' : '2px'),
+      'left:' + Math.random()*100 + '%',
+      'top:-20px',
+      'position:absolute',
+      'opacity:1'
+    ].join(';');
+    container.appendChild(p);
+    const duration = Math.random()*1500 + 1000;
+    const xDrift = (Math.random()-0.5)*300;
+    p.animate([
+      {transform:'translateY(0) rotate(0deg) translateX(0)', opacity:1},
+      {transform:'translateY('+window.innerHeight+'px) rotate('+(Math.random()*720)+'deg) translateX('+xDrift+'px)', opacity:0}
+    ], {duration, easing:'cubic-bezier(0.25,0.46,0.45,0.94)', fill:'forwards'});
+  }
+  setTimeout(() => container.innerHTML = '', 3000);
+}
+
 document.getElementById('pushBtn').addEventListener('click', pushClicked);
 document.getElementById('verifyBtn').addEventListener('click', verifyCode);
 window.addEventListener('resize', () => {
@@ -924,9 +1180,6 @@ window.addEventListener('resize', () => {
 buildDropdown();
 initCanvas();
 loadVideosHoy();
-</script>
-</body>
-</html>
 </script>
 </body>
 </html>
