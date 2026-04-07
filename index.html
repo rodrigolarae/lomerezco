@@ -131,7 +131,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .wheel-glow{position:absolute;inset:-12px;border-radius:50%;background:conic-gradient(#9a0000,#ffd700,#cc1a00,#ffd700,#9a0000);animation:glowSpin 6s linear infinite;opacity:0.15;filter:blur(12px);z-index:0;transition:opacity 0.5s}
 .wheel-spinning .wheel-glow{opacity:0.55;animation-duration:2s}
 @keyframes glowSpin{to{transform:rotate(360deg)}}
-.wheel-pointer{position:absolute;top:-20px;left:50%;transform:translateX(-50%);z-index:20;filter:drop-shadow(0 0 6px var(--gold))}
+.wheel-pointer{position:absolute;top:-30px;left:50%;transform:translateX(-50%);z-index:20;filter:drop-shadow(0 0 10px var(--gold)) drop-shadow(0 0 4px #fff8);transition:filter 0.1s}
+.wheel-pointer.flash{filter:drop-shadow(0 0 20px #fff) drop-shadow(0 0 10px var(--gold)) brightness(1.4)}
 canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px rgba(180,80,0,0.07),0 8px 0 rgba(0,0,0,0.6),0 16px 40px rgba(0,0,0,0.85);display:block;position:relative;z-index:1}
 .wcenter{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fffbe0,#ffd700 50%,#9a6b00);box-shadow:0 0 0 3px rgba(255,200,80,0.25),0 3px 10px rgba(0,0,0,0.7);z-index:10}
 
@@ -284,7 +285,7 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
 .push-center-sub{font-family:'Oswald',sans-serif;font-size:9px;color:rgba(255,200,100,0.75);letter-spacing:0.06em;line-height:1}
 
 /* ===== BARRA GIROS ===== */
-.giros-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:0.6rem 0 0.3rem}
+.giros-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:0.8rem 0 1rem}
 .giro-pip{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'Oswald',sans-serif;letter-spacing:0.05em;border:1.5px solid;transition:all 0.3s}
 .giro-pip.disponible{background:rgba(255,160,0,0.1);border-color:rgba(255,160,0,0.35);color:rgba(255,160,0,0.7)}
 .giro-pip.usado{background:rgba(120,15,0,0.3);border-color:rgba(180,20,0,0.35);color:rgba(255,80,40,0.45)}
@@ -412,9 +413,10 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
       <div class="wheel-outer" id="wheelOuter">
         <div class="wheel-glow"></div>
         <div class="wheel-pointer">
-          <svg width="26" height="34" viewBox="0 0 26 34">
-            <polygon points="13,2 24,32 13,26 2,32" fill="#ffd700" stroke="#9a6b00" stroke-width="1.5"/>
-            <circle cx="13" cy="26" r="4" fill="#fffbe0" stroke="#ffd700" stroke-width="1.5"/>
+          <svg width="30" height="42" viewBox="0 0 30 42">
+            <!-- Flecha apuntando HACIA ABAJO hacia la ruleta -->
+            <polygon points="15,40 2,6 15,14 28,6" fill="#ffd700" stroke="#9a6b00" stroke-width="1.5"/>
+            <circle cx="15" cy="8" r="5" fill="#fffbe0" stroke="#ffd700" stroke-width="1.5"/>
           </svg>
         </div>
         <canvas id="wc"></canvas>
@@ -624,9 +626,14 @@ function playDrum(){try{const c=getAC();const b=c.createOscillator(),g=c.createG
 
 /* ===== CANVAS ===== */
 function initCanvas(){
-  const vw=Math.min(window.innerWidth-40,440);WS=Math.min(vw,290);
+  const vw=Math.min(window.innerWidth-24,520);
+  WS=Math.min(vw,360);
   const wrap=document.getElementById('wheelWrap');const cv=document.getElementById('wc');
-  cv.width=WS;cv.height=WS;wrap.style.width=WS+'px';wrap.style.height=WS+'px';
+  cv.width=WS;cv.height=WS;
+  wrap.style.width=WS+'px';wrap.style.height=WS+'px';
+  // Ajustar botón push central
+  const pb=document.getElementById('spinBtn');
+  if(pb){const sz=Math.max(68,Math.round(WS*0.21));pb.style.width=sz+'px';pb.style.height=sz+'px';}
   drawWheel(currentAngle);
 }
 
@@ -674,22 +681,45 @@ function drawWheel(angle){
   });
   ct.restore();
 
+  /* Calcular segmento bajo el puntero */
+  const na=((angle%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+  const pa=(Math.PI*1.5-na+2*Math.PI)%(2*Math.PI);
+  const activeIdx=Math.floor(pa/arc)%n;
+
+  /* Iluminar segmento activo con overlay brillante */
+  ct.save();ct.translate(s,s);ct.rotate(angle);
+  const asi=activeIdx*arc-Math.PI/2;const aei=asi+arc;
+  ct.beginPath();ct.moveTo(0,0);ct.arc(0,0,r,asi,aei);ct.closePath();
+  ct.fillStyle='rgba(255,255,255,0.18)';ct.fill();
+  /* Borde brillante del segmento activo */
+  ct.beginPath();ct.moveTo(0,0);ct.arc(0,0,r,asi,aei);ct.closePath();
+  ct.strokeStyle='rgba(255,230,100,0.6)';ct.lineWidth=2.5;ct.stroke();
+  ct.restore();
+
   /* Aro dorado exterior 3D */
   const rim=ct.createLinearGradient(0,0,WS,WS);
   rim.addColorStop(0,'#fffbe0');rim.addColorStop(0.2,'#ffd700');rim.addColorStop(0.5,'#9a6b00');rim.addColorStop(0.8,'#ffd700');rim.addColorStop(1,'#fffbe0');
-  ct.beginPath();ct.arc(s,s,r+3,0,Math.PI*2);ct.strokeStyle=rim;ct.lineWidth=8;ct.stroke();
-  /* Sombra interna del aro */
-  ct.beginPath();ct.arc(s,s,r+7,0,Math.PI*2);ct.strokeStyle='rgba(0,0,0,0.6)';ct.lineWidth=3;ct.stroke();
+  ct.beginPath();ct.arc(s,s,r+3,0,Math.PI*2);ct.strokeStyle=rim;ct.lineWidth=9;ct.stroke();
+  ct.beginPath();ct.arc(s,s,r+8,0,Math.PI*2);ct.strokeStyle='rgba(0,0,0,0.65)';ct.lineWidth=4;ct.stroke();
   ct.beginPath();ct.arc(s,s,r-1,0,Math.PI*2);ct.strokeStyle='rgba(0,0,0,0.5)';ct.lineWidth=3;ct.stroke();
   /* Destellos en el aro */
   for(let d=0;d<17;d++){
-    const a=(d/17)*Math.PI*2+(currentAngle%( Math.PI*2));
+    const a=(d/17)*Math.PI*2+(currentAngle%(Math.PI*2));
     const x=s+(r+4)*Math.cos(a),y=s+(r+4)*Math.sin(a);
     ct.beginPath();ct.arc(x,y,d%3===0?3.5:2.2,0,Math.PI*2);
     ct.fillStyle=d%3===0?'#ffd700':d%3===1?'#fff':'rgba(255,200,80,0.6)';
     ct.fill();
   }
+
+  /* Flash del puntero cuando cambia segmento */
+  if(typeof lastActiveIdx!=='undefined'&&lastActiveIdx!==activeIdx){
+    const ptr=document.getElementById('spinBtn')?.parentElement?.querySelector('.wheel-pointer');
+    if(ptr){ptr.classList.add('flash');setTimeout(()=>ptr.classList.remove('flash'),90);}
+  }
+  lastActiveIdx=activeIdx;
 }
+
+let lastActiveIdx=-1;
 
 /* ===== SPIN ===== */
 function spinWheel(){
@@ -712,11 +742,23 @@ function spinWheel(){
   let lastTickTime=0;
   let drumBeats=0;
 
-  /* Función de ease: aceleración rápida + desaceleración muy dramática */
+  /* Ease: arranque fuerte → velocidad pico → desaceleración MUY dramática */
   function ease(t){
-    if(t<0.15){/* Arranca fuerte */return (t/0.15)*(t/0.15)*0.35;}
-    else if(t<0.55){/* Velocidad máxima */return 0.35+(t-0.15)/0.4*0.45;}
-    else{/* Desaceleración dramática — cúbica */const p=(t-0.55)/0.45;return 0.80+p*p*p*0.20;}
+    if(t<0.12){
+      /* Aceleración explosiva */
+      return (t/0.12)*(t/0.12)*0.28;
+    } else if(t<0.45){
+      /* Velocidad máxima sostenida */
+      return 0.28+(t-0.12)/0.33*0.47;
+    } else if(t<0.75){
+      /* Inicio desaceleración gradual */
+      const p=(t-0.45)/0.30;
+      return 0.75+p*p*0.12;
+    } else {
+      /* Frenada final DRAMÁTICA — cuártica */
+      const p=(t-0.75)/0.25;
+      return 0.87+p*p*p*p*0.13;
+    }
   }
 
   function frame(now){
@@ -732,15 +774,15 @@ function spinWheel(){
     const angDiff=angle-lastTickAngle;
     const timeDiff=now-lastTickTime;
 
-    /* Tick — frecuencia varía con velocidad */
+    /* Tick — frecuencia y volumen varían con velocidad */
     if(angDiff>=sliceAngle){
-      const speedFactor=Math.max(0.1,1-t);
-      const freq=200+speedFactor*700;
-      const vol=0.06+speedFactor*0.1;
+      const speedFactor=Math.max(0.02,1-t);
+      const freq=150+speedFactor*900;  /* más grave al final */
+      const vol=Math.min(0.18, 0.05+speedFactor*0.15);
       playTick(freq,vol);
       lastTickAngle+=sliceAngle;
-      /* Redoble dramático al final */
-      if(t>0.85&&drumBeats<6&&timeDiff>80){playDrum();drumBeats++;lastTickTime=now;}
+      /* Redoble dramático en los últimos momentos */
+      if(t>0.80&&drumBeats<8&&timeDiff>60){playDrum();drumBeats++;lastTickTime=now;}
     }
 
     if(t<1){requestAnimationFrame(frame);}
