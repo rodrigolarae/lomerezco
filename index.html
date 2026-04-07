@@ -252,6 +252,45 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
 .toast{position:fixed;bottom:calc(var(--nav-h) + 10px);left:50%;transform:translateX(-50%);background:rgba(25,8,1,0.97);color:var(--gold);padding:9px 18px;border-radius:20px;font-size:12px;z-index:700;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;border:1px solid rgba(255,140,0,0.18);font-family:'Oswald',sans-serif;letter-spacing:0.07em;box-shadow:0 4px 14px rgba(0,0,0,0.6)}
 .toast.show{opacity:1}
 
+
+/* ===== BOTÓN PUSH CENTRAL ===== */
+.push-center-btn{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:72px;height:72px;
+  border-radius:50%;border:none;cursor:pointer;
+  background:radial-gradient(circle at 38% 32%,#ff7755,#cc1a00 50%,#7a0e00 85%);
+  box-shadow:
+    0 0 0 3px rgba(180,40,0,0.3),
+    0 0 0 6px rgba(100,10,0,0.15),
+    0 4px 0 #4a0800,
+    0 8px 18px rgba(0,0,0,0.8),
+    0 0 25px rgba(200,30,0,0.4),
+    inset 0 3px 8px rgba(255,140,100,0.35),
+    inset 0 -3px 6px rgba(0,0,0,0.5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  z-index:15;
+  transition:transform 0.08s,box-shadow 0.08s;
+  animation:pushCenterPulse 2.5s ease-in-out infinite;
+}
+.push-center-btn::after{content:'';position:absolute;inset:6px;border-radius:50%;background:radial-gradient(circle at 40% 30%,rgba(255,255,255,0.12),transparent 55%);pointer-events:none}
+.push-center-btn:active{transform:translate(-50%,-50%) translateY(4px)!important;animation:none;box-shadow:0 0 0 3px rgba(180,40,0,0.2),0 1px 0 #4a0800,0 3px 8px rgba(0,0,0,0.7)}
+.push-center-btn:disabled{opacity:0.35;cursor:not-allowed;animation:none}
+@keyframes pushCenterPulse{
+  0%,100%{box-shadow:0 0 0 3px rgba(180,40,0,0.3),0 0 0 6px rgba(100,10,0,0.15),0 4px 0 #4a0800,0 8px 18px rgba(0,0,0,0.8),0 0 25px rgba(200,30,0,0.4),inset 0 3px 8px rgba(255,140,100,0.35),inset 0 -3px 6px rgba(0,0,0,0.5)}
+  50%{box-shadow:0 0 0 4px rgba(200,50,0,0.45),0 0 0 9px rgba(130,15,0,0.2),0 4px 0 #4a0800,0 8px 18px rgba(0,0,0,0.8),0 0 40px rgba(230,50,0,0.6),inset 0 3px 8px rgba(255,140,100,0.35),inset 0 -3px 6px rgba(0,0,0,0.5)}
+}
+.push-center-label{font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;color:#fff;letter-spacing:0.1em;text-shadow:0 1px 4px rgba(0,0,0,0.8);line-height:1}
+.push-center-sub{font-family:'Oswald',sans-serif;font-size:9px;color:rgba(255,200,100,0.75);letter-spacing:0.06em;line-height:1}
+
+/* ===== BARRA GIROS ===== */
+.giros-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:0.6rem 0 0.3rem}
+.giro-pip{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'Oswald',sans-serif;letter-spacing:0.05em;border:1.5px solid;transition:all 0.3s}
+.giro-pip.disponible{background:rgba(255,160,0,0.1);border-color:rgba(255,160,0,0.35);color:rgba(255,160,0,0.7)}
+.giro-pip.usado{background:rgba(120,15,0,0.3);border-color:rgba(180,20,0,0.35);color:rgba(255,80,40,0.45)}
+.giro-pip.activo{background:rgba(255,160,0,0.15);border-color:var(--gold);color:var(--gold);box-shadow:0 0 10px rgba(255,160,0,0.25)}
+.giros-label{font-family:'Oswald',sans-serif;font-size:10px;color:rgba(255,160,0,0.4);letter-spacing:0.1em;text-transform:uppercase;text-align:center;margin-bottom:0.2rem}
+
 @media(max-width:400px){.reg-form,.modal{padding:1rem}}
 </style>
 </head>
@@ -353,32 +392,21 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
 
 <!-- ===== PÁGINA RULETA ===== -->
 <div id="page-ruleta" class="page">
-  <div class="sesiones-contador" id="sesionesContador"></div>
-  <div class="sesion-activa" id="sesionActiva">
-    <div class="sesion-header">
-      <span class="sesion-titulo" id="sesionTitulo">Sesión activa</span>
-      <div class="sesion-giros" id="sesionGiros"></div>
-    </div>
-    <div class="sesion-producto" id="sesionProducto"></div>
-  </div>
 
-  <button class="quiero-comprar-btn" id="qcBtn" onclick="openCompraModal()">
-    <span class="qc-icon">🛒</span>
-    <div class="qc-text">
-      <div class="qc-title" id="qcTitle">Quiero comprar algo...</div>
-      <div class="qc-sub" id="qcSub">Presiona para activar 3 giros</div>
-    </div>
-  </button>
+  <!-- Contador de giros -->
+  <div class="giros-bar" id="girosBar"></div>
 
+  <!-- Banner video -->
   <div class="video-banner" id="videoBanner" onclick="watchVideo()" style="display:none">
     <span class="vb-icon">▶️</span>
     <div class="vb-text">
-      <div class="vb-title">Ver video — desbloquear nueva sesión</div>
-      <div class="vb-sub" id="vbSub">3 giros más disponibles</div>
+      <div class="vb-title">Ver video — ganar 1 giro extra</div>
+      <div class="vb-sub" id="vbSub">Mira 30 segundos y gira de nuevo</div>
     </div>
-    <span class="vb-badge">+3</span>
+    <span class="vb-badge">+1</span>
   </div>
 
+  <!-- Ruleta con PUSH en el centro -->
   <div class="wheel-section">
     <div class="wheel-wrap" id="wheelWrap">
       <div class="wheel-outer" id="wheelOuter">
@@ -390,14 +418,17 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
           </svg>
         </div>
         <canvas id="wc"></canvas>
-        <div class="wcenter"></div>
+        <!-- BOTÓN PUSH EN EL CENTRO -->
+        <button class="push-center-btn" id="spinBtn" onclick="spinWheel()">
+          <span class="push-center-label">PUSH</span>
+          <span class="push-center-sub" id="pushCenterSub">3 giros</span>
+        </button>
       </div>
     </div>
     <div class="legend">
       <div class="li"><div class="ld" style="background:#cc1a00"></div><span>Compra sin culpa (3)</span></div>
       <div class="li"><div class="ld" style="background:#1a6b3a"></div><span>Autocontrol (14)</span></div>
     </div>
-    <button class="spin-btn" id="spinBtn" onclick="spinWheel()">GIRAR</button>
   </div>
 </div>
 
@@ -454,24 +485,7 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
   <div class="nav-item" id="nav-historial" onclick="navTo('historial')"><span class="nav-icon">📋</span><span class="nav-label">Historial</span></div>
 </nav>
 
-<!-- MODAL: QUIERO COMPRAR -->
-<div class="modal-overlay" id="compraModal">
-  <div class="modal">
-    <h3>🛒 ¿Cuánto cuesta?</h3>
-    <p>Ingresa el monto. Te ayuda a medir tus hábitos.</p>
-    <input class="monto-input" type="number" id="montoInput" placeholder="Ej: 25990">
-    <div class="cat-grid">
-      <div class="cat-btn" onclick="selectCat(this,'👕 Ropa')">👕 Ropa</div>
-      <div class="cat-btn" onclick="selectCat(this,'📱 Tech')">📱 Tech</div>
-      <div class="cat-btn" onclick="selectCat(this,'🍔 Comida')">🍔 Comida</div>
-      <div class="cat-btn" onclick="selectCat(this,'🎮 Entret.')">🎮 Entret.</div>
-      <div class="cat-btn" onclick="selectCat(this,'🏠 Hogar')">🏠 Hogar</div>
-      <div class="cat-btn selected" onclick="selectCat(this,'📦 Otro')">📦 Otro</div>
-    </div>
-    <button class="modal-btn btn-red" onclick="iniciarSesionCompra()">🎡 ¡Girar la ruleta!</button>
-    <button class="modal-btn btn-cancel" onclick="closeModal('compraModal')">Cancelar</button>
-  </div>
-</div>
+<!-- sin modal compra -->
 
 <!-- MODAL: VIDEO -->
 <div class="modal-overlay" id="videoModal">
@@ -529,9 +543,59 @@ let currentLang='es',currentAngle=0,spinning=false,audioCtx=null,WS=280;
 let lastSeg=null,categoriaSeleccionada='📦 Otro',montoPendiente=0,vidInterval=null;
 let ovTimer1=null,ovTimer2=null,ovTimer3=null;
 
-/* ===== SESIONES ===== */
+/* ===== SISTEMA GIROS SIMPLE ===== */
 const HOY=()=>new Date().toDateString();
-function getSes(){const d=JSON.parse(localStorage.getItem('lm_ses')||'{}');if(d.fecha!==HOY())return{fecha:HOY(),total:0,activa:false,giros:0,producto:'',monto:0,cat:''};return d;}
+
+function getGiros(){
+  const d=JSON.parse(localStorage.getItem('lm_giros')||'{}');
+  if(d.fecha!==HOY()) return {fecha:HOY(), usados:0, extra:0};
+  return d;
+}
+function saveGiros(g){localStorage.setItem('lm_giros',JSON.stringify(g));}
+function girosDisponibles(){const g=getGiros(); return Math.max(0, 3+g.extra-g.usados);}
+function usarGiro(){const g=getGiros(); g.usados=(g.usados||0)+1; saveGiros(g); updateGirosUI();}
+function agregarGiro(){const g=getGiros(); g.extra=(g.extra||0)+1; saveGiros(g); updateGirosUI();}
+
+function updateGirosUI(){
+  const disp=girosDisponibles();
+  const g=getGiros();
+  const total=3+(g.extra||0);
+  const bar=document.getElementById('girosBar');
+  if(!bar) return;
+
+  bar.innerHTML='';
+  const wrap=document.createElement('div');
+  wrap.style.cssText='text-align:center;width:100%';
+  const lbl=document.createElement('div');
+  lbl.className='giros-label';
+  lbl.textContent=disp+' giro'+(disp!==1?'s':'')+' disponible'+(disp!==1?'s':'')+' hoy';
+  wrap.appendChild(lbl);
+  const pips=document.createElement('div');
+  pips.style.cssText='display:flex;gap:8px;justify-content:center;margin-top:4px';
+  for(let i=0;i<total;i++){
+    const p=document.createElement('div');
+    p.className='giro-pip';
+    if(i>=total-(g.usados||0)){p.classList.add('usado');p.textContent='✗';}
+    else if(i===total-(g.usados||0)-1&&disp>0){p.classList.add('activo');p.textContent='▶';}
+    else{p.classList.add('disponible');p.textContent='○';}
+    pips.appendChild(p);
+  }
+  wrap.appendChild(pips);
+  bar.appendChild(wrap);
+
+  // Botón push central
+  const btn=document.getElementById('spinBtn');
+  const sub=document.getElementById('pushCenterSub');
+  if(btn){
+    btn.disabled=disp<=0||spinning;
+    if(sub) sub.textContent=disp>0?disp+' giro'+(disp!==1?'s':''):'Sin giros';
+  }
+
+  // Video banner — mostrar si no hay giros
+  const vb=document.getElementById('videoBanner');
+  if(vb) vb.style.display=disp<=0?'flex':'none';
+}
+// legacy placeholder;if(d.fecha!==HOY())return{fecha:HOY(),total:0,activa:false,giros:0,producto:'',monto:0,cat:''};return d;}
 function saveSes(s){localStorage.setItem('lm_ses',JSON.stringify(s));}
 function puedeNuevaSesion(){return getSes().total<3;}
 function iniciarSesion(monto,cat){const s=getSes();s.activa=true;s.giros=0;s.total++;s.producto=cat+(monto>0?' — $'+Math.round(monto).toLocaleString('es-CL'):'');s.monto=monto;s.cat=cat;saveSes(s);updateSesUI();}
@@ -630,8 +694,8 @@ function drawWheel(angle){
 /* ===== SPIN ===== */
 function spinWheel(){
   if(spinning)return;
-  if(!sesActiva()){showToast('Presiona "Quiero comprar algo" para iniciar sesión.');return;}
-  spinning=true;gastarGiro();
+  if(girosDisponibles()<=0){showToast('Sin giros disponibles. ¡Mira un video para ganar uno!');return;}
+  spinning=true;usarGiro();
   clearOverlays();
   document.getElementById('spinBtn').disabled=true;
   document.getElementById('wheelOuter').classList.add('wheel-spinning');
@@ -683,7 +747,7 @@ function spinWheel(){
     else{
       spinning=false;
       document.getElementById('wheelOuter').classList.remove('wheel-spinning');
-      updateSesUI();
+      updateGirosUI();
       const na=((angle%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
       const pa=(Math.PI*1.5-na+2*Math.PI)%(2*Math.PI);
       const wi=Math.floor(pa/sliceAngle)%n;
@@ -764,8 +828,7 @@ function reflexion(decision){
   });
   /* Guardar stats */
   const resistio=(decision==='no');
-  const ses=getSes();
-  registrarDecision(ses.monto||0,ses.cat||'otro',resistio);
+  registrarDecision(0,'otro',resistio);
   if(resistio)updateRacha(true);
   saveHistory(lastSeg.full,lastSeg.type,decision);
   renderHistorial();
@@ -828,12 +891,12 @@ function renderHistorial(){const h=JSON.parse(localStorage.getItem('lm_history')
 function openCompraModal(){if(!puedeNuevaSesion()){showToast('Has usado tus 3 sesiones de hoy.');return;}document.getElementById('montoInput').value='';categoriaSeleccionada='📦 Otro';document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));document.querySelector('#compraModal .cat-btn:last-child').classList.add('selected');document.getElementById('compraModal').classList.add('open');}
 function iniciarSesionCompra(){const v=parseFloat(document.getElementById('montoInput').value)||0;montoPendiente=v;closeModal('compraModal');iniciarSesion(v,categoriaSeleccionada);navTo('ruleta');showToast('¡Sesión activa! 3 giros para esta compra.');updateSesUI();}
 function selectCat(el,cat){document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');categoriaSeleccionada=cat;}
-function watchVideo(){document.getElementById('videoModal').classList.add('open');document.getElementById('vidRewardMsg').style.display='none';document.getElementById('vidProgress').style.width='0%';let s=30;document.getElementById('vidTimer').textContent=s;if(vidInterval)clearInterval(vidInterval);vidInterval=setInterval(()=>{s--;document.getElementById('vidTimer').textContent=s;document.getElementById('vidProgress').style.width=((30-s)/30*100)+'%';if(s<=0){clearInterval(vidInterval);vidInterval=null;document.getElementById('vidRewardMsg').style.display='block';const ses=getSes();ses.activa=false;ses.giros=0;saveSes(ses);updateSesUI();setTimeout(()=>closeModal('videoModal'),1500);showToast('¡Nueva sesión desbloqueada!');}},1000);}
+function watchVideo(){document.getElementById('videoModal').classList.add('open');document.getElementById('vidRewardMsg').style.display='none';document.getElementById('vidProgress').style.width='0%';let s=30;document.getElementById('vidTimer').textContent=s;if(vidInterval)clearInterval(vidInterval);vidInterval=setInterval(()=>{s--;document.getElementById('vidTimer').textContent=s;document.getElementById('vidProgress').style.width=((30-s)/30*100)+'%';if(s<=0){clearInterval(vidInterval);vidInterval=null;document.getElementById('vidRewardMsg').style.display='block';agregarGiro();updateGirosUI();setTimeout(()=>closeModal('videoModal'),1500);showToast('¡+1 giro ganado!');}},1000);}
 function closeModal(id){document.getElementById(id).classList.remove('open');if(vidInterval){clearInterval(vidInterval);vidInterval=null;}}
 function subscribeMock(){closeModal('subModal');showToast('¡Suscripción activa! Sesiones ilimitadas. ⭐');}
 
 /* ===== NAVEGACIÓN ===== */
-function navTo(pg){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+pg).classList.add('active');document.getElementById('nav-'+pg).classList.add('active');if(pg==='ruleta'){initCanvas();updateSesUI();}if(pg==='progreso'){renderStats();renderLogros();renderResumen();}if(pg==='historial')renderHistorial();}
+function navTo(pg){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+pg).classList.add('active');document.getElementById('nav-'+pg).classList.add('active');if(pg==='ruleta'){initCanvas();updateGirosUI();}if(pg==='progreso'){renderStats();renderLogros();renderResumen();}if(pg==='historial')renderHistorial();}
 
 /* ===== REGISTRO ===== */
 function showView(id){['view-registro','view-confirm'].forEach(v=>document.getElementById(v).style.display='none');document.getElementById(id).style.display='block';}
@@ -855,7 +918,7 @@ function buildMarquee(){['ml-top','ml-bot'].forEach(id=>{const el=document.getEl
 document.getElementById('pushBtn').addEventListener('click',pushClicked);
 document.getElementById('verifyBtn').addEventListener('click',verifyCode);
 window.addEventListener('resize',()=>{if(document.getElementById('page-ruleta').classList.contains('active'))initCanvas();});
-buildDropdown();buildMarquee();initCanvas();renderStats();renderLogros();renderHistorial();updateSesUI();
+buildDropdown();buildMarquee();initCanvas();renderStats();renderLogros();renderHistorial();updateGirosUI();
 </script>
 </body>
 </html>
