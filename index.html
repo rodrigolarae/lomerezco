@@ -286,7 +286,7 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
 .push-center-sub{font-family:'Oswald',sans-serif;font-size:9px;color:rgba(255,200,100,0.75);letter-spacing:0.06em;line-height:1}
 
 /* ===== BARRA GIROS ===== */
-.giros-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:0.8rem 0 1rem}
+.giros-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:0.8rem 0 1.6rem}
 .giro-pip{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'Oswald',sans-serif;letter-spacing:0.05em;border:1.5px solid;transition:all 0.3s}
 .giro-pip.disponible{background:rgba(255,160,0,0.1);border-color:rgba(255,160,0,0.35);color:rgba(255,160,0,0.7)}
 .giro-pip.usado{background:rgba(120,15,0,0.3);border-color:rgba(180,20,0,0.35);color:rgba(255,80,40,0.45)}
@@ -543,7 +543,7 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
       </div>
       <div class="fin-res-sep">=</div>
       <div class="fin-res-item">
-        <div class="fin-res-label">Balance</div>
+        <div class="fin-res-label">Flujo libre</div>
         <div class="fin-res-val" id="finBalance">$0</div>
       </div>
     </div>
@@ -563,19 +563,10 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
       <div id="ingresosList"></div>
     </div>
 
-    <!-- GASTOS FIJOS -->
-    <div class="fin-section">
-      <div class="fin-section-header red-h">
-        <span>📤 Gastos fijos</span>
-        <button class="fin-add-btn" onclick="addGasto('fijo')">+ Agregar</button>
-      </div>
-      <div id="gastosFijosList"></div>
-    </div>
-
-    <!-- GASTOS VARIABLES -->
+    <!-- GASTOS -->
     <div class="fin-section">
       <div class="fin-section-header orange-h">
-        <span>🛒 Gastos variables</span>
+        <span>💸 Mis gastos</span>
         <button class="fin-add-btn" onclick="addGasto('variable')">+ Agregar</button>
       </div>
       <div id="gastosVariablesList"></div>
@@ -1098,7 +1089,7 @@ const FIN_CATEGORIAS = {
     {emoji:'💡',name:'Electricidad / Agua'},
     {emoji:'🔥',name:'Gas'},
     {emoji:'🏥',name:'Seguro de salud / Isapre'},
-    {emoji:'🔒',name:'AFP / Previsión'},
+    {emoji:'🏦',name:'Previsión privada'},
     {emoji:'🎓',name:'Colegio / Universidad'},
     {emoji:'🧒',name:'Guardería / Jardín'},
     {emoji:'🐾',name:'Veterinario / Mascotas'},
@@ -1145,9 +1136,9 @@ function addIngreso(){
 }
 
 function addGasto(tipo){
-  finModalType = tipo;
-  document.getElementById('finModalTitle').textContent = tipo === 'fijo' ? '📤 Gasto fijo' : '🛒 Gasto variable';
-  buildFinSelect(tipo);
+  finModalType = 'variable';
+  document.getElementById('finModalTitle').textContent = '💸 Agregar gasto';
+  buildFinSelect('variable');
   document.getElementById('finNombre').value = '';
   document.getElementById('finMonto').value = '';
   document.getElementById('finModal').classList.add('open');
@@ -1185,7 +1176,6 @@ function guardarFinItem(){
 function deleteFinItem(tipo, id){
   const d = getFinData();
   if(tipo === 'ingreso') d.ingresos = d.ingresos.filter(i => i.id !== id);
-  else if(tipo === 'fijo') d.gastosFijos = d.gastosFijos.filter(i => i.id !== id);
   else d.gastosVariables = d.gastosVariables.filter(i => i.id !== id);
   saveFinData(d);
   renderFinanzas();
@@ -1210,9 +1200,8 @@ function renderFinItem(item, tipo){
 function renderFinanzas(){
   const d = getFinData();
   const totalI = d.ingresos.reduce((s,i) => s+i.monto, 0);
-  const totalF = d.gastosFijos.reduce((s,i) => s+i.monto, 0);
   const totalV = d.gastosVariables.reduce((s,i) => s+i.monto, 0);
-  const totalG = totalF + totalV;
+  const totalG = totalV;
   const balance = totalI - totalG;
   const pct = totalI > 0 ? Math.min(100, Math.round(totalG / totalI * 100)) : 0;
 
@@ -1232,11 +1221,6 @@ function renderFinanzas(){
   il.innerHTML = d.ingresos.length
     ? d.ingresos.map(i => renderFinItem(i,'ingreso')).join('')
     : '<div class="fin-empty">Sin ingresos registrados</div>';
-
-  const gfl = document.getElementById('gastosFijosList');
-  gfl.innerHTML = d.gastosFijos.length
-    ? d.gastosFijos.map(i => renderFinItem(i,'fijo')).join('')
-    : '<div class="fin-empty">Sin gastos fijos registrados</div>';
 
   const gvl = document.getElementById('gastosVariablesList');
   gvl.innerHTML = d.gastosVariables.length
