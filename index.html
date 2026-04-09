@@ -449,6 +449,14 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
 .cal-det-dec.resistio{color:#22bb44}
 
 
+
+/* ===== TARJETA COMPARTIR ===== */
+.compartir-card{background:linear-gradient(160deg,rgba(20,8,2,0.95),rgba(40,15,2,0.9));border:1px solid rgba(255,160,0,0.2);border-radius:16px;padding:14px;margin:0.5rem 0;overflow:hidden;position:relative}
+.compartir-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.compartir-preview{font-size:11px;color:rgba(255,200,120,0.6);font-family:'Lato',sans-serif;line-height:1.6;margin-bottom:12px;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;min-height:60px;white-space:pre-line;border-left:2px solid rgba(255,160,0,0.2)}
+.compartir-btn{width:100%;padding:13px;background:linear-gradient(135deg,#9a6b00,#ffd700,#9a6b00);color:#1a0500;border:none;border-radius:10px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 0 var(--golddark),0 0 20px rgba(255,160,0,0.2);transition:transform 0.08s,box-shadow 0.08s}
+.compartir-btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--golddark)}
+
 /* ===== INSIGHTS ===== */
 .insights-panel{background:linear-gradient(135deg,rgba(0,30,60,0.85),rgba(0,20,40,0.9));border:1px solid rgba(60,140,255,0.2);border-radius:14px;padding:12px;overflow:hidden}
 .insight-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(60,140,255,0.08)}
@@ -625,9 +633,14 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
       <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-value" id="statAhorro">$0</div><div class="stat-label">ahorrado</div></div>
       <div class="stat-card"><div class="stat-icon">🧠</div><div class="stat-value" id="statNivel">Nv.1</div><div class="stat-label">autocontrol</div></div>
     </div>
-    <button onclick="compartirLogro()" style="width:100%;padding:12px;background:linear-gradient(135deg,rgba(255,160,0,0.15),rgba(255,100,0,0.1));border:1px solid rgba(255,140,0,0.25);border-radius:12px;color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;margin-bottom:0.5rem;transition:all 0.2s" onmouseover="this.style.background='linear-gradient(135deg,rgba(255,160,0,0.25),rgba(255,100,0,0.2))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(255,160,0,0.15),rgba(255,100,0,0.1))'">
-      🚀 Compartir mi progreso
-    </button>
+    <!-- TARJETA COMPARTIR -->
+    <div class="compartir-card">
+      <div class="compartir-preview" id="compartirPreview"></div>
+      <button class="compartir-btn" onclick="compartirLogro()">
+        <span style="font-size:1.3em">🚀</span>
+        <span>Compartir mi progreso</span>
+      </button>
+    </div>
     <div class="nivel-bar-wrap">
       <div class="nivel-header">
         <span class="nivel-titulo">Nivel de autocontrol</span>
@@ -1337,7 +1350,7 @@ function closeModal(id){document.getElementById(id).classList.remove('open');if(
 function subscribeMock(){closeModal('subModal');showToast('¡Suscripción activa! Sesiones ilimitadas. ⭐');}
 
 /* ===== NAVEGACIÓN ===== */
-function navTo(pg){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+pg).classList.add('active');document.getElementById('nav-'+pg).classList.add('active');if(pg==='ruleta'){initCanvas();updateGirosUI();}if(pg==='progreso'){renderStatsV2();renderLogrosV2();renderResumen();renderInsights();}if(pg==='historial')renderHistorial();if(pg==='finanzas')renderFinanzas();if(pg==='calendario')renderCalendario();if(pg==='calendario')renderCalendario();}
+function navTo(pg){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+pg).classList.add('active');document.getElementById('nav-'+pg).classList.add('active');if(pg==='ruleta'){initCanvas();updateGirosUI();}if(pg==='progreso'){renderStatsV2();renderLogrosV2();renderResumen();renderInsights();actualizarPreviewCompartir();}if(pg==='historial')renderHistorial();if(pg==='finanzas')renderFinanzas();if(pg==='calendario')renderCalendario();if(pg==='calendario')renderCalendario();}
 
 /* ===== REGISTRO ===== */
 function showView(id){['view-registro','view-confirm'].forEach(v=>document.getElementById(v).style.display='none');document.getElementById(id).style.display='block';}
@@ -2106,20 +2119,30 @@ function renderInsights() {
 }
 
 /* ── VIRAL: COMPARTIR LOGRO ── */
-function compartirLogro() {
+function generarTextoCompartir() {
   const s = getStats();
   const rn = getRachaNivel(s.rachaActual || 0);
   const nivel = getNivel(calcPuntos(s));
   const resistidas = s.totalResistidas || 0;
   const ahorro = (s.totalAhorro || 0).toLocaleString('es-CL');
-  const texto = [
-    '🎡 lomerezco.cl me ayuda a controlar mis impulsos de compra',
-    rn.emoji + ' Llevo ' + (s.rachaActual||0) + ' días de racha — Nivel: ' + nivel.emoji + ' ' + nivel.nombre,
-    '💪 He resistido ' + resistidas + ' compras impulsivas',
-    '💰 He ahorrado $' + ahorro + ' que iba a gastar de impulso',
-    '¿Cuánto gastas TÚ en impulsos? 👉 lomerezco.cl',
+  return [
+    '🎡 lomerezco.cl — Control de impulsos',
+    rn.emoji + ' ' + (s.rachaActual||0) + ' días de racha — ' + nivel.emoji + ' ' + nivel.nombre,
+    '💪 ' + resistidas + ' compras resistidas',
+    '💰 $' + ahorro + ' ahorrados de impulsos',
+    '¿Y tú cuánto gastas? 👉 lomerezco.cl',
   ].join('\n');
+}
 
+function actualizarPreviewCompartir() {
+  const el = document.getElementById('compartirPreview');
+  if (el) el.textContent = generarTextoCompartir();
+}
+
+function compartirLogro() {
+  const texto = generarTextoCompartir();
+
+  actualizarPreviewCompartir();
   if (navigator.share) {
     navigator.share({ title: 'lomerezco.cl', text: texto })
       .catch(() => copiarTexto(texto));
@@ -2183,6 +2206,9 @@ buildDropdown();buildMarquee();initCanvas();renderStatsV2();renderLogrosV2();ren
     <button class="modal-btn btn-cancel" onclick="closeModal('finModal')">Cancelar</button>
   </div>
 </div>
+
+</body>
+</html>
 
 </body>
 </html>
