@@ -448,6 +448,22 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
 .cal-det-dec.compro{color:#e74c3c}
 .cal-det-dec.resistio{color:#22bb44}
 
+
+/* ===== INSIGHTS ===== */
+.insights-panel{background:linear-gradient(135deg,rgba(0,30,60,0.85),rgba(0,20,40,0.9));border:1px solid rgba(60,140,255,0.2);border-radius:14px;padding:12px;overflow:hidden}
+.insight-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(60,140,255,0.08)}
+.insight-item:last-child{border-bottom:none}
+.insight-emoji{font-size:1.2em;flex-shrink:0;margin-top:1px}
+.insight-texto{font-size:12px;color:rgba(180,220,255,0.85);line-height:1.45;font-family:Lato,sans-serif}
+
+/* ===== LOGRO ANIMADO ── */
+.logro-item.unlocked{animation:none}
+.logro-item.unlocked:hover{transform:scale(1.08);cursor:pointer}
+.logro-item{cursor:pointer;transition:transform 0.15s}
+
+/* ===== RACHA SHIELD ===== */
+.shield-badge{display:inline-block;background:rgba(243,156,18,0.2);border:1px solid rgba(243,156,18,0.4);border-radius:20px;padding:2px 8px;font-size:9px;color:#f39c12;font-family:Oswald,sans-serif;letter-spacing:0.06em;margin-left:6px}
+
 @media(max-width:400px){.reg-form,.modal{padding:1rem}}
 </style>
 </head>
@@ -603,11 +619,15 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
         <div class="racha-sub" id="rachaSub">Resiste una compra para comenzar</div>
       </div>
     </div>
+    <div class="insights-panel" id="insightsPanel" style="display:none;margin:0.5rem 0"></div>
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value" id="statDias">0</div><div class="stat-label">días racha</div></div>
       <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-value" id="statAhorro">$0</div><div class="stat-label">ahorrado</div></div>
       <div class="stat-card"><div class="stat-icon">🧠</div><div class="stat-value" id="statNivel">Nv.1</div><div class="stat-label">autocontrol</div></div>
     </div>
+    <button onclick="compartirLogro()" style="width:100%;padding:12px;background:linear-gradient(135deg,rgba(255,160,0,0.15),rgba(255,100,0,0.1));border:1px solid rgba(255,140,0,0.25);border-radius:12px;color:var(--gold);font-family:Oswald,sans-serif;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;margin-bottom:0.5rem;transition:all 0.2s" onmouseover="this.style.background='linear-gradient(135deg,rgba(255,160,0,0.25),rgba(255,100,0,0.2))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(255,160,0,0.15),rgba(255,100,0,0.1))'">
+      🚀 Compartir mi progreso
+    </button>
     <div class="nivel-bar-wrap">
       <div class="nivel-header">
         <span class="nivel-titulo">Nivel de autocontrol</span>
@@ -1249,6 +1269,10 @@ function reflexion(decision){
   saveHistory(lastSeg.full,lastSeg.type,decision);
   registrarImpulsoCalendario(lastSeg.full,lastSeg.type,decision);
   renderHistorial();
+  const sAfter = getStats();
+  feedbackInmediato(decision, sAfter.rachaActual);
+  renderStatsV2();
+  checkLogrosV2(sAfter);
 }
 
 /* ===== CONFETTI ===== */
@@ -1313,7 +1337,7 @@ function closeModal(id){document.getElementById(id).classList.remove('open');if(
 function subscribeMock(){closeModal('subModal');showToast('¡Suscripción activa! Sesiones ilimitadas. ⭐');}
 
 /* ===== NAVEGACIÓN ===== */
-function navTo(pg){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+pg).classList.add('active');document.getElementById('nav-'+pg).classList.add('active');if(pg==='ruleta'){initCanvas();updateGirosUI();}if(pg==='progreso'){renderStats();renderLogros();renderResumen();}if(pg==='historial')renderHistorial();if(pg==='finanzas')renderFinanzas();if(pg==='calendario')renderCalendario();if(pg==='calendario')renderCalendario();}
+function navTo(pg){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+pg).classList.add('active');document.getElementById('nav-'+pg).classList.add('active');if(pg==='ruleta'){initCanvas();updateGirosUI();}if(pg==='progreso'){renderStatsV2();renderLogrosV2();renderResumen();renderInsights();}if(pg==='historial')renderHistorial();if(pg==='finanzas')renderFinanzas();if(pg==='calendario')renderCalendario();if(pg==='calendario')renderCalendario();}
 
 /* ===== REGISTRO ===== */
 function showView(id){['view-registro','view-confirm'].forEach(v=>document.getElementById(v).style.display='none');document.getElementById(id).style.display='block';}
@@ -1748,11 +1772,404 @@ function mostrarDetalleDia(dateStr, items) {
     `).join('');
 }
 
+/* ============================================================
+   ENGINE v2 — Retención · Engagement · Gamificación · Growth
+   Rodrigo Larae — lomerezco.cl
+   ============================================================ */
+
+/* ── NIVELES DEL SISTEMA ── */
+const NIVELES = [
+  { min:0,   nombre:'Explorador',   emoji:'🌱', color:'#4a9eff' },
+  { min:5,   nombre:'Consciente',   emoji:'🌿', color:'#22bb44' },
+  { min:15,  nombre:'Disciplinado', emoji:'💪', color:'#f39c12' },
+  { min:30,  nombre:'Estratega',    emoji:'🎯', color:'#9b59b6' },
+  { min:60,  nombre:'Maestro',      emoji:'👑', color:'#ffd700' },
+  { min:100, nombre:'Leyenda',      emoji:'🔥', color:'#e74c3c' },
+];
+
+/* ── ETIQUETAS DE RACHA ── */
+const RACHA_NIVELES = [
+  { dias:0,  label:'Sin racha',        emoji:'💤', mult:1.0 },
+  { dias:3,  label:'En racha',         emoji:'🔥', mult:1.2 },
+  { dias:7,  label:'Racha caliente',   emoji:'⚡', mult:1.5 },
+  { dias:14, label:'Racha de fuego',   emoji:'🌋', mult:2.0 },
+  { dias:30, label:'Imparable',        emoji:'👑', mult:3.0 },
+];
+
+/* ── MENSAJES CONTEXTUALES DINÁMICOS ── */
+const MSG = {
+  resistio: [
+    '¡Cerebro 1, impulso 0!', 'Tu billetera te lo agradece 💚',
+    '¡Eso se llama carácter!', 'Cada NO es un SÍ a tu futuro',
+    'El dinero que no gastas, trabaja para ti', '¡Ganaste la batalla de hoy!',
+  ],
+  compro: [
+    'Está bien, lo disfrutaste con consciencia 😌', 'La ruleta lo aprobó, disfrútalo',
+    'Vivir también cuesta dinero 😄', 'Una vez no hace daño — eso dijiste ;)',
+    'Gastaste, pero eres consciente de ello', 'Mañana volvemos a resistir 💪',
+  ],
+  racha_en_riesgo: [
+    '⚠️ ¡Tu racha está en juego hoy!', '🔥 No rompas tu racha ahora',
+    '⚡ Llevas días construyendo esto — no lo pierdas',
+  ],
+  racha_nueva: [
+    '🔥 ¡Racha iniciada! El primer día es el más difícil',
+    '¡Arrancó tu racha! Mañana vuelve a resistir',
+  ],
+  dia_critico: [
+    '🌙 Las noches del viernes son las más peligrosas', '🛍️ Los lunes del sueldo son tentadores',
+    '⚠️ Es fin de semana — alto riesgo de compra impulsiva',
+  ],
+  primer_uso: ['¡Bienvenido/a! Tu primer giro, tu primer paso 🌱'],
+  sin_uso_dias: ['👋 ¡Hace días que no te vemos! ¿Tienes algún impulso pendiente?'],
+};
+
+/* ── OBTENER NIVEL POR PUNTOS ── */
+function getNivel(puntos) {
+  for (let i = NIVELES.length - 1; i >= 0; i--) {
+    if (puntos >= NIVELES[i].min) return { ...NIVELES[i], idx: i };
+  }
+  return { ...NIVELES[0], idx: 0 };
+}
+
+/* ── OBTENER NIVEL DE RACHA ── */
+function getRachaNivel(dias) {
+  for (let i = RACHA_NIVELES.length - 1; i >= 0; i--) {
+    if (dias >= RACHA_NIVELES[i].dias) return RACHA_NIVELES[i];
+  }
+  return RACHA_NIVELES[0];
+}
+
+/* ── CALCULAR PUNTOS TOTALES ── */
+function calcPuntos(s) {
+  const rn = getRachaNivel(s.rachaActual);
+  const base = (s.totalResistidas || 0) * 10 + (s.totalCompradas || 0) * 2;
+  return Math.round(base * rn.mult);
+}
+
+/* ── RACHA MEJORADA con protección de 1 fallo ── */
+function updateRachaV2(resistio) {
+  const s = getStats();
+  const hoy = new Date().toDateString();
+  const ayer = new Date(Date.now() - 86400000).toDateString();
+  const anteayer = new Date(Date.now() - 172800000).toDateString();
+
+  if (resistio) {
+    if (s.ultimoDia === ayer) {
+      s.rachaActual = (s.rachaActual || 0) + 1;
+      s.rachaShield = false; // reset escudo al resistir
+    } else if (s.ultimoDia === anteayer && s.rachaShield) {
+      // Protección activada: el fallo de ayer está perdonado
+      s.rachaActual = (s.rachaActual || 0) + 1;
+      s.rachaShield = false;
+    } else if (s.ultimoDia !== hoy) {
+      // Perdió la racha pero arrancamos de nuevo
+      if ((s.rachaActual || 0) > 0) {
+        s.rachaAnterior = s.rachaActual;
+        showToastNivel('😔 Racha de ' + s.rachaActual + ' días terminó. ¡A empezar de nuevo!', '#e74c3c');
+      }
+      s.rachaActual = 1;
+      s.rachaShield = false;
+    }
+    s.ultimoDia = hoy;
+    if ((s.rachaActual || 0) > (s.rachaMax || 0)) s.rachaMax = s.rachaActual;
+    // Activar escudo si racha >= 3 y no fue usado hoy
+    if ((s.rachaActual || 0) >= 3 && !s.rachaShield) s.rachaShield = true;
+  } else {
+    // No resistió — degradar si corresponde
+    if (s.ultimoDia !== hoy && (s.rachaActual || 0) > 0) {
+      if (s.rachaShield) {
+        s.rachaShield = false;
+        showToastNivel('🛡️ ¡Escudo de racha usado! Tu racha sobrevivió', '#f39c12');
+      }
+    }
+  }
+  saveStats(s);
+  renderStatsV2();
+  checkLogrosV2(s);
+}
+
+/* ── MENSAJE RANDOM ── */
+function msgRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+/* ── CONTEXTO DEL DÍA ── */
+function getDiaContexto() {
+  const h = new Date().getHours();
+  const d = new Date().getDay(); // 0=dom, 5=vie, 6=sab
+  if (d === 5 && h >= 18) return 'dia_critico';
+  if (d === 6 || d === 0) return 'dia_critico';
+  return null;
+}
+
+/* ── FEEDBACK INMEDIATO post-decisión ── */
+function feedbackInmediato(decision, rachaActual) {
+  const rn = getRachaNivel(rachaActual || 0);
+  let msg;
+  if (decision === 'no') {
+    msg = msgRandom(MSG.resistio);
+    if ((rachaActual || 0) >= 3) msg = rn.emoji + ' ' + rn.label + ' — ' + msg;
+  } else {
+    msg = msgRandom(MSG.compro);
+  }
+  showToastNivel(msg, decision === 'no' ? '#22bb44' : '#e74c3c');
+}
+
+/* ── TOAST CON COLOR ── */
+function showToastNivel(msg, color) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.style.borderColor = color || 'rgba(255,140,0,0.18)';
+  t.style.color = color || 'var(--gold)';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.classList.remove('show');
+    t.style.borderColor = '';
+    t.style.color = '';
+  }, 3500);
+}
+
+/* ── RENDERIZAR STATS V2 ── */
+function renderStatsV2() {
+  const s = getStats();
+  const puntos = calcPuntos(s);
+  const nivel = getNivel(puntos);
+  const rn = getRachaNivel(s.rachaActual || 0);
+  const sigNivel = NIVELES[Math.min(nivel.idx + 1, NIVELES.length - 1)];
+  const pctNivel = nivel.idx < NIVELES.length - 1
+    ? Math.round((puntos - nivel.min) / (sigNivel.min - nivel.min) * 100)
+    : 100;
+
+  // Stats básicas
+  const setTxt = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  setTxt('statDias', s.rachaActual || 0);
+  const ah = s.totalAhorro || 0;
+  setTxt('statAhorro', ah >= 1000 ? '$' + Math.round(ah/1000) + 'K' : '$' + ah.toLocaleString('es-CL'));
+  setTxt('statNivel', nivel.emoji + ' ' + nivel.nombre);
+
+  // Barra de nivel
+  const fill = document.getElementById('nivelFill');
+  const pctEl = document.getElementById('nivelPct');
+  if (fill) fill.style.width = pctNivel + '%';
+  if (pctEl) pctEl.textContent = puntos + ' pts';
+
+  // Racha banner
+  const rt = document.getElementById('rachaTitle');
+  const rs = document.getElementById('rachaSub');
+  if (rt) rt.textContent = rn.emoji + ' ' + (s.rachaActual || 0) + ' días — ' + rn.label;
+  if (rs) {
+    const shield = s.rachaShield ? ' 🛡️ Escudo activo' : '';
+    rs.textContent = 'Multiplicador x' + rn.mult + shield;
+  }
+
+  // Puntos en stat card
+  const statNivelEl = document.getElementById('statNivel');
+  if (statNivelEl) {
+    statNivelEl.textContent = nivel.emoji;
+    statNivelEl.style.fontSize = '1.4em';
+  }
+  const statNivelLabel = statNivelEl?.parentElement?.querySelector('.stat-label');
+  if (statNivelLabel) statNivelLabel.textContent = nivel.nombre;
+}
+
+/* ── LOGROS V2 — con recompensas y desbloqueos ── */
+const LOGROS_V2 = [
+  { id:'primer_giro',   emoji:'🌱', name:'Primer impulso',      pts:10,  check: s => (s.totalResistidas||0)+(s.totalCompradas||0) >= 1 },
+  { id:'tres_resistido',emoji:'💪', name:'3 victorias',         pts:30,  check: s => (s.totalResistidas||0) >= 3 },
+  { id:'racha3',        emoji:'🔥', name:'Racha de 3 días',     pts:50,  check: s => (s.rachaMax||0) >= 3 },
+  { id:'diez_resist',   emoji:'🏆', name:'10 compras evitadas', pts:100, check: s => (s.totalResistidas||0) >= 10 },
+  { id:'racha7',        emoji:'⚡', name:'Racha de 7 días',     pts:150, check: s => (s.rachaMax||0) >= 7 },
+  { id:'ahorro10k',     emoji:'💰', name:'$10.000 ahorrados',   pts:200, check: s => (s.totalAhorro||0) >= 10000 },
+  { id:'racha14',       emoji:'🌋', name:'Racha de 14 días',    pts:300, check: s => (s.rachaMax||0) >= 14 },
+  { id:'ahorro50k',     emoji:'💎', name:'$50.000 ahorrados',   pts:500, check: s => (s.totalAhorro||0) >= 50000 },
+  { id:'racha30',       emoji:'👑', name:'Racha de 30 días',    pts:1000,check: s => (s.rachaMax||0) >= 30 },
+  { id:'cien_resist',   emoji:'🚀', name:'100 victorias',       pts:2000,check: s => (s.totalResistidas||0) >= 100 },
+];
+
+function checkLogrosV2(s) {
+  if (!s) s = getStats();
+  let nuevos = [];
+  LOGROS_V2.forEach(l => {
+    if (!s.logros.includes(l.id) && l.check(s)) {
+      s.logros.push(l.id);
+      nuevos.push(l);
+    }
+  });
+  if (nuevos.length) {
+    saveStats(s);
+    nuevos.forEach((l, i) => {
+      setTimeout(() => {
+        showToastNivel('🏆 ' + l.emoji + ' ' + l.name + ' +' + l.pts + 'pts', '#ffd700');
+        launchConfetti && launchConfetti();
+      }, i * 1200);
+    });
+    setTimeout(() => renderLogrosV2(), 500);
+  }
+}
+
+function renderLogrosV2() {
+  const s = getStats();
+  const grid = document.getElementById('logrosGrid');
+  if (!grid) return;
+  grid.innerHTML = LOGROS_V2.map(l => {
+    const done = s.logros.includes(l.id);
+    const pctCheck = done ? 100 : getLogroPct(l, s);
+    return `<div class="logro-item ${done ? 'unlocked' : ''}" title="${l.name} (+${l.pts}pts)"
+      onclick="showToastNivel('${l.emoji} ${l.name} — ${done ? '¡Desbloqueado! +'+l.pts+'pts' : 'En progreso: '+pctCheck+'%'}', '${done ? '#ffd700' : 'rgba(255,140,0,0.5)'}')">
+      <div class="logro-emoji">${l.emoji}</div>
+      <div class="logro-name">${l.name}</div>
+      ${done ? '<div style="font-size:9px;color:#ffd700;font-family:Oswald,sans-serif">+'+l.pts+'pts</div>' : '<div style="font-size:9px;color:rgba(255,140,0,0.3);font-family:Oswald,sans-serif">'+pctCheck+'%</div>'}
+    </div>`;
+  }).join('');
+}
+
+function getLogroPct(logro, s) {
+  const checks = {
+    'primer_giro':    [1, (s.totalResistidas||0)+(s.totalCompradas||0)],
+    'tres_resistido': [3, s.totalResistidas||0],
+    'racha3':         [3, s.rachaMax||0],
+    'diez_resist':    [10, s.totalResistidas||0],
+    'racha7':         [7, s.rachaMax||0],
+    'ahorro10k':      [10000, s.totalAhorro||0],
+    'racha14':        [14, s.rachaMax||0],
+    'ahorro50k':      [50000, s.totalAhorro||0],
+    'racha30':        [30, s.rachaMax||0],
+    'cien_resist':    [100, s.totalResistidas||0],
+  };
+  const c = checks[logro.id];
+  if (!c) return 0;
+  return Math.min(99, Math.round(c[1] / c[0] * 100));
+}
+
+/* ── INSIGHTS AUTOMÁTICOS ── */
+function generarInsights() {
+  const hist = JSON.parse(localStorage.getItem('lm_history') || '[]');
+  const s = getStats();
+  const insights = [];
+
+  if (hist.length < 3) return insights;
+
+  // Patrón: día de la semana más peligroso
+  const porDia = [0,0,0,0,0,0,0];
+  hist.forEach(h => {
+    const d = new Date(h.fecha || Date.now()).getDay();
+    if (h.dec === 'si') porDia[d]++;
+  });
+  const maxDia = porDia.indexOf(Math.max(...porDia));
+  const dias = ['domingos','lunes','martes','miércoles','jueves','viernes','sábados'];
+  if (porDia[maxDia] >= 2) {
+    insights.push({ emoji:'📊', texto: 'Los ' + dias[maxDia] + ' son tu día más peligroso de compra impulsiva.' });
+  }
+
+  // Patrón: tasa de resistencia
+  const total = hist.length;
+  const resistidas = hist.filter(h => h.dec === 'no').length;
+  const tasa = Math.round(resistidas / total * 100);
+  if (tasa >= 70) {
+    insights.push({ emoji:'🏆', texto: 'Resistes el ' + tasa + '% de tus impulsos. Estás en el top.' });
+  } else if (tasa <= 30) {
+    insights.push({ emoji:'⚠️', texto: 'Solo resistes el ' + tasa + '% de impulsos. Hay margen de mejora.' });
+  }
+
+  // Proyección de ahorro
+  const semanas = Math.max(1, Math.round(hist.length / 3));
+  const ahorroSemanal = (s.totalAhorro || 0) / semanas;
+  if (ahorroSemanal > 0) {
+    const mensual = Math.round(ahorroSemanal * 4);
+    const anual = Math.round(ahorroSemanal * 52);
+    insights.push({
+      emoji:'💡',
+      texto: 'A este ritmo ahorras $' + mensual.toLocaleString('es-CL') + '/mes → $' + anual.toLocaleString('es-CL') + '/año.'
+    });
+  }
+
+  // Racha en riesgo
+  const hoy = new Date().toDateString();
+  const ayer = new Date(Date.now() - 86400000).toDateString();
+  if (s.ultimoDia === ayer && (s.rachaActual || 0) >= 3) {
+    insights.push({ emoji:'🔥', texto: '¡Tu racha de ' + s.rachaActual + ' días está en juego hoy! No la rompas.' });
+  }
+
+  return insights;
+}
+
+function renderInsights() {
+  const insights = generarInsights();
+  let el = document.getElementById('insightsPanel');
+  if (!el) return;
+  if (!insights.length) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = insights.map(i =>
+    `<div class="insight-item"><span class="insight-emoji">${i.emoji}</span><span class="insight-texto">${i.texto}</span></div>`
+  ).join('');
+}
+
+/* ── VIRAL: COMPARTIR LOGRO ── */
+function compartirLogro() {
+  const s = getStats();
+  const rn = getRachaNivel(s.rachaActual || 0);
+  const nivel = getNivel(calcPuntos(s));
+  const resistidas = s.totalResistidas || 0;
+  const ahorro = (s.totalAhorro || 0).toLocaleString('es-CL');
+  const texto = [
+    '🎡 lomerezco.cl me ayuda a controlar mis impulsos de compra',
+    rn.emoji + ' Llevo ' + (s.rachaActual||0) + ' días de racha — Nivel: ' + nivel.emoji + ' ' + nivel.nombre,
+    '💪 He resistido ' + resistidas + ' compras impulsivas',
+    '💰 He ahorrado $' + ahorro + ' que iba a gastar de impulso',
+    '¿Cuánto gastas TÚ en impulsos? 👉 lomerezco.cl',
+  ].join('\n');
+
+  if (navigator.share) {
+    navigator.share({ title: 'lomerezco.cl', text: texto })
+      .catch(() => copiarTexto(texto));
+  } else {
+    copiarTexto(texto);
+  }
+}
+
+function copiarTexto(texto) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(texto).then(() =>
+      showToastNivel('📋 ¡Copiado! Pégalo donde quieras compartirlo', '#22bb44')
+    );
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = texto; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    showToastNivel('📋 ¡Copiado!', '#22bb44');
+  }
+}
+
+/* ── ALERTA DIARIA CONTEXTUAL ── */
+function alertaContextual() {
+  const ctx = getDiaContexto();
+  if (ctx) showToastNivel(msgRandom(MSG[ctx]), '#f39c12');
+}
+
+/* ── REEMPLAZAR FUNCIONES LEGACY ── */
+// Parchear updateRacha para usar V2
+const _updateRachaLegacy = typeof updateRacha !== 'undefined' ? updateRacha : null;
+updateRacha = updateRachaV2;
+
+// Parchear renderStats para usar V2
+const _renderStatsLegacy = typeof renderStats !== 'undefined' ? renderStats : null;
+renderStats = renderStatsV2;
+
+// Parchear checkLogros para usar V2
+const _checkLogrosLegacy = typeof checkLogros !== 'undefined' ? checkLogros : null;
+checkLogros = (s) => checkLogrosV2(s);
+
+// Parchear renderLogros para usar V2
+renderLogros = renderLogrosV2;
+
+
+
 /* ===== INIT ===== */
 document.getElementById('pushBtn').addEventListener('click',pushClicked);
 document.getElementById('verifyBtn').addEventListener('click',verifyCode);
 window.addEventListener('resize',()=>{if(document.getElementById('page-ruleta').classList.contains('active'))initCanvas();});
-buildDropdown();buildMarquee();initCanvas();renderStats();renderLogros();renderHistorial();updateGirosUI();renderFinanzas();
+buildDropdown();buildMarquee();initCanvas();renderStatsV2();renderLogrosV2();renderHistorial();updateGirosUI();renderFinanzas();setTimeout(alertaContextual,2000);
 </script>
 
 <!-- MODAL: AGREGAR INGRESO/GASTO -->
