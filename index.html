@@ -11,9 +11,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Oswald:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-*:focus{outline:none}
-button:focus{outline:none}
-button{-webkit-tap-highlight-color:transparent}
+*{outline:none!important;-webkit-tap-highlight-color:transparent!important}
+*:focus{outline:none!important;box-shadow:none!important}
+*:focus-visible{outline:none!important}
+button,div,a,input,select{outline:none!important;-webkit-tap-highlight-color:transparent!important}
 :root{
   --gold:#ffd700;--gold2:#ffaa00;--gold3:#c8860a;--golddark:#6b4c00;
   --red:#cc1a00;--red2:#ff2200;--reddark:#4a0800;
@@ -459,7 +460,7 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
 
 
 /* ===== TARJETA COMPARTIR ===== */
-.compartir-card{background:linear-gradient(160deg,rgba(20,8,2,0.95),rgba(40,15,2,0.9));border:1px solid rgba(255,160,0,0.2);border-radius:16px;padding:14px;margin:0.5rem 0;overflow:hidden;position:relative}
+.compartir-card{background:linear-gradient(160deg,rgba(20,8,2,0.95),rgba(40,15,2,0.9));border:1px solid rgba(255,160,0,0.2);border-radius:16px;padding:14px;margin:0.5rem 0;overflow:hidden;position:relative;outline:none;-webkit-tap-highlight-color:transparent}
 .compartir-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .compartir-preview{font-size:11px;color:rgba(255,200,120,0.6);font-family:'Lato',sans-serif;line-height:1.6;margin-bottom:12px;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;min-height:60px;white-space:pre-line;border-left:2px solid rgba(255,160,0,0.2)}
 .compartir-btn{width:100%;padding:13px;background:linear-gradient(135deg,#9a6b00,#ffd700,#9a6b00);color:#1a0500;border:none;border-radius:10px;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 0 var(--golddark),0 0 20px rgba(255,160,0,0.2);transition:transform 0.08s,box-shadow 0.08s;outline:none;-webkit-tap-highlight-color:transparent}
@@ -661,7 +662,7 @@ canvas#wc{border-radius:50%;box-shadow:0 0 0 5px rgba(255,160,0,0.12),0 0 0 10px
       <div class="stat-card"><div class="stat-icon">🧠</div><div class="stat-value" id="statNivel">Nv.1</div><div class="stat-label">autocontrol</div></div>
     </div>
     <!-- TARJETA COMPARTIR -->
-    <div class="compartir-card">
+    <div class="compartir-card" tabindex="-1">
       <div class="compartir-preview" id="compartirPreview"></div>
       <button class="compartir-btn" onclick="compartirLogro()">
         <span style="font-size:1.3em">🚀</span>
